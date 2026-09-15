@@ -6,6 +6,7 @@
     --ink:#1A1C22; --ink-2:#565A64; --muted:#8B8E96; --border:#E3E1DB; --border-2:#EDECE7;
     --accent:#1F6F6B; --accent-fill:#1F6F6B1A;
     --v65:#3E6F9E; --tlt:#C4913A; --momo:#8A6FB0;
+    --ushf:#4C8C4A; --usaw:#C0574A; --aumomo:#B85C93; --auaw:#3E9AA8; --augrowth:#8A8C3E; --augrowthdef:#7A6A56;
     --up:#3E8F5F; --down:#C0503E;
     --shadow:0 1px 2px rgba(20,22,28,.05), 0 8px 26px -14px rgba(20,22,28,.14);
   }
@@ -14,6 +15,7 @@
     --ink:#E6E5E1; --ink-2:#A8AAB0; --muted:#7C7E85; --border:#2B2D33; --border-2:#232429;
     --accent:#4FA9A3; --accent-fill:#4FA9A322;
     --v65:#6C9CCB; --tlt:#D9A94F; --momo:#AE93D8;
+    --ushf:#6FB06D; --usaw:#D97F70; --aumomo:#D687B5; --auaw:#63C2D0; --augrowth:#B0B35F; --augrowthdef:#A08D76;
     --up:#5CB682; --down:#D9705C;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 36px -18px rgba(0,0,0,.6);
   }}
@@ -22,6 +24,7 @@
     --ink:#E6E5E1; --ink-2:#A8AAB0; --muted:#7C7E85; --border:#2B2D33; --border-2:#232429;
     --accent:#4FA9A3; --accent-fill:#4FA9A322;
     --v65:#6C9CCB; --tlt:#D9A94F; --momo:#AE93D8;
+    --ushf:#6FB06D; --usaw:#D97F70; --aumomo:#D687B5; --auaw:#63C2D0; --augrowth:#B0B35F; --augrowthdef:#A08D76;
     --up:#5CB682; --down:#D9705C;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 36px -18px rgba(0,0,0,.6);
   }
@@ -48,10 +51,14 @@
   .mix-head{display:flex;align-items:baseline;justify-content:space-between;}
   .mix-head b{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;}
   .mix-head a{font-size:12.5px;color:var(--accent);cursor:pointer;font-family:"IBM Plex Mono",monospace;}
-  .slider-row{display:grid;grid-template-columns:110px 1fr 56px;align-items:center;gap:12px;}
+  .slider-row{display:grid;grid-template-columns:150px 1fr 56px;align-items:center;gap:12px;transition:opacity .15s;}
+  .slider-row.disabled{opacity:.4;}
   .slider-row .name{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500;}
-  .slider-row .sw{width:10px;height:10px;border-radius:3px;flex:none;}
+  .slider-row .name input[type=checkbox]{accent-color:var(--sc,var(--accent));flex:none;width:15px;height:15px;cursor:pointer;}
+  .slider-row .sw,.legend-item .sw{width:10px;height:10px;border-radius:3px;flex:none;}
+  .slider-row .name span.lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .slider-row input[type=range]{width:100%;accent-color:var(--sc,var(--accent));height:18px;}
+  .slider-row input[type=range]:disabled{pointer-events:none;}
   .slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;text-align:right;}
   .mixbar{height:8px;border-radius:5px;overflow:hidden;display:flex;border:1px solid var(--border-2);}
   .mixbar span{height:100%;transition:width .12s;}
@@ -86,7 +93,21 @@
   .range-row{display:flex;align-items:center;gap:12px;padding:10px 2px 2px;border-top:1px solid var(--border-2);margin-top:8px;}
   .range-row .rlabel{font-size:12.5px;color:var(--ink-2);font-weight:500;flex:none;}
   .range-row input[type=range]{flex:1;accent-color:var(--accent);height:18px;}
-  .range-row .rval{font-family:"IBM Plex Mono",monospace;font-size:13.5px;font-weight:600;flex:none;min-width:38px;text-align:right;}
+  .range-row .rval{font-family:"IBM Plex Mono",monospace;font-size:13.5px;font-weight:600;flex:none;min-width:60px;text-align:right;}
+
+  .dual-track{position:relative;flex:1;height:22px;display:flex;align-items:center;}
+  .dual-track::before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;border-radius:2px;background:var(--border-2);transform:translateY(-50%);}
+  .dual-track .fill{position:absolute;top:50%;height:4px;border-radius:2px;background:var(--accent);transform:translateY(-50%);}
+  .dual-track input[type=range]{position:absolute;left:0;right:0;width:100%;margin:0;height:22px;
+    background:transparent;-webkit-appearance:none;appearance:none;pointer-events:none;}
+  .dual-track input[type=range]::-webkit-slider-runnable-track{background:transparent;height:22px;}
+  .dual-track input[type=range]::-moz-range-track{background:transparent;height:22px;}
+  .dual-track input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;
+    width:16px;height:16px;border-radius:50%;background:var(--accent);border:2px solid var(--surface);
+    box-shadow:0 1px 3px rgba(20,22,28,.3);cursor:pointer;margin-top:0;}
+  .dual-track input[type=range]::-moz-range-thumb{pointer-events:auto;width:16px;height:16px;border-radius:50%;
+    background:var(--accent);border:2px solid var(--surface);box-shadow:0 1px 3px rgba(20,22,28,.3);cursor:pointer;}
+  .dual-track input[type=range].top{z-index:3;}
 
   footer{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);
     display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0 2px;}
@@ -105,14 +126,17 @@
     .mix-head b{font-size:13.5px;}
     .chart-card{padding:16px 14px 10px;}
     .chart-title{font-size:17px;}
-    .slider-row{grid-template-columns:78px 1fr 48px;gap:8px;}
+    .slider-row{grid-template-columns:118px 1fr 48px;gap:8px;}
     .slider-row .name{font-size:14px;gap:6px;}
     .slider-row .val{font-size:15px;}
     .slider-row input[type=range]{height:26px;}
     .range-row{gap:10px;}
     .range-row .rlabel{font-size:13px;}
     .range-row input[type=range]{height:26px;}
-    .range-row .rval{font-size:14.5px;}
+    .range-row .rval{font-size:14.5px;min-width:68px;}
+    .dual-track,.dual-track input[type=range]{height:26px;}
+    .dual-track input[type=range]::-webkit-slider-thumb{width:20px;height:20px;}
+    .dual-track input[type=range]::-moz-range-thumb{width:20px;height:20px;}
     .chart-wrap{height:340px;}
     #bwrap{height:300px !important;}
     .legend{gap:12px;}
@@ -129,65 +153,42 @@
   <div>
     <div class="eyebrow">Clenow research &middot; monthly-return blend</div>
     <h1>Portfolio blend explorer</h1>
-    <p class="sub">Blend <b style="color:var(--v65)">ChowMo</b>, <b style="color:var(--tlt)">TLT</b> and <b style="color:var(--momo)">Momo</b> by allocation weight &mdash; each month's blended return is the weighted average of the three portfolios' own monthly returns, compounded from <code>$1.00</code> starting January 2007. Drag a slider; the other two rebalance to keep the mix at 100%.</p>
+    <p class="sub">Tick the portfolios you want in the mix, then blend them by allocation weight &mdash; each month's blended return is the weighted average of the ticked portfolios' own monthly returns, compounded from <code>$1.00</code> starting January 2007. Drag a slider; the other ticked ones rebalance to keep the mix at 100%.</p>
   </div>
 
   <div class="kpis" id="kpis"></div>
 
   <div class="card mix-card">
-    <div class="mix-head"><b>Allocation mix</b><a id="resetMix">reset to equal thirds</a></div>
-    <div class="slider-row" style="--sc:var(--v65)">
-      <div class="name"><span class="sw" style="background:var(--v65)"></span>ChowMo</div>
-      <input type="range" id="s-v65" min="0" max="100" step="1" value="34">
-      <div class="val mono" id="v-v65">34%</div>
-    </div>
-    <div class="slider-row" style="--sc:var(--tlt)">
-      <div class="name"><span class="sw" style="background:var(--tlt)"></span>TLT</div>
-      <input type="range" id="s-tlt" min="0" max="100" step="1" value="33">
-      <div class="val mono" id="v-tlt">33%</div>
-    </div>
-    <div class="slider-row" style="--sc:var(--momo)">
-      <div class="name"><span class="sw" style="background:var(--momo)"></span>Momo</div>
-      <input type="range" id="s-momo" min="0" max="100" step="1" value="33">
-      <div class="val mono" id="v-momo">33%</div>
-    </div>
-    <div class="mixbar">
-      <span id="bar-v65" style="background:var(--v65)"></span>
-      <span id="bar-tlt" style="background:var(--tlt)"></span>
-      <span id="bar-momo" style="background:var(--momo)"></span>
-    </div>
+    <div class="mix-head"><b>Allocation mix</b><a id="resetMix">reset to equal split</a></div>
+    <div id="mixRows"></div>
+    <div class="mixbar" id="mixBar"></div>
   </div>
 
   <div class="card chart-card">
     <div class="chart-title">Equity Curves</div>
     <div class="chart-head">
-      <div class="legend">
-        <div class="legend-item combined"><span class="ln" style="border-color:var(--accent)"></span>Combined (weighted mix)</div>
-        <div class="legend-item"><span class="ln" style="border-color:var(--v65)"></span>ChowMo</div>
-        <div class="legend-item"><span class="ln" style="border-color:var(--tlt)"></span>TLT</div>
-        <div class="legend-item"><span class="ln" style="border-color:var(--momo)"></span>Momo</div>
-      </div>
+      <div class="legend" id="curveLegend"></div>
       <label class="toggle"><input type="checkbox" id="showIndiv" checked>Show individual portfolios</label>
     </div>
     <div class="chart-wrap" id="cwrap">
-      <canvas id="cv" role="img" aria-label="Log-scale equity curve chart comparing three portfolios (ChowMo, TLT, Momo) and their weighted-allocation combined blend, monthly from January 2007 to September 2026."></canvas>
+      <canvas id="cv" role="img" aria-label="Log-scale equity curve chart comparing the ticked portfolios and their weighted-allocation combined blend, monthly from January 2007 to September 2026."></canvas>
       <div id="tip"></div>
     </div>
     <div class="range-row">
-      <span class="rlabel">Start year</span>
-      <input type="range" id="startYear" min="2007" max="2026" step="1" value="2007">
-      <span class="rval mono" id="startYearVal">2007</span>
+      <span class="rlabel">Years</span>
+      <div class="dual-track">
+        <span class="fill" id="yearFill"></span>
+        <input type="range" id="startYear" min="2007" max="2026" step="1" value="2007">
+        <input type="range" id="endYear" min="2007" max="2026" step="1" value="2026">
+      </div>
+      <span class="rval mono"><span id="startYearVal">2007</span>&ndash;<span id="endYearVal">2026</span></span>
     </div>
   </div>
 
   <div class="card chart-card">
     <div class="chart-title">Portfolio Returns</div>
     <div class="chart-head">
-      <div class="legend">
-        <div class="legend-item"><span class="sw" style="background:var(--v65)"></span>ChowMo</div>
-        <div class="legend-item"><span class="sw" style="background:var(--tlt)"></span>TLT</div>
-        <div class="legend-item"><span class="sw" style="background:var(--momo)"></span>Momo</div>
-      </div>
+      <div class="legend" id="barLegend"></div>
       <div style="display:flex;align-items:center;gap:10px;">
         <span class="resgrp" id="periodGrp">
           <button data-p="year" class="on">Yearly</button>
@@ -196,7 +197,7 @@
       </div>
     </div>
     <div class="chart-wrap" id="bwrap" style="height:320px;">
-      <canvas id="bc" role="img" aria-label="Bar chart comparing period returns of ChowMo, TLT and Momo, toggleable between yearly totals and a single year's monthly breakdown."></canvas>
+      <canvas id="bc" role="img" aria-label="Bar chart comparing period returns of the ticked portfolios, toggleable between yearly totals and a single year's monthly breakdown."></canvas>
       <div id="btip"></div>
     </div>
     <div class="range-row" id="bYearRow" hidden>
@@ -208,7 +209,7 @@
 
   <footer>
     <span>237 months &middot; Jan 2007 &rarr; Sep 2026</span>
-    <span>ChowMo: RealTest equity export (test 24) &middot; TLT / Momo: pasted monthly return tables, compounded</span>
+    <span>ChowMo: RealTest equity export (test 24) &middot; all other portfolios: pasted monthly return tables, compounded</span>
   </footer>
 </div>
 
@@ -217,54 +218,160 @@
 const $ = s => document.querySelector(s);
 const chartFontPx = () => window.innerWidth<=640 ? 13 : 11;
 const cssv = n => getComputedStyle(document.body).getPropertyValue(n).trim();
-const DATA = {"labels": ["2007-01", "2007-02", "2007-03", "2007-04", "2007-05", "2007-06", "2007-07", "2007-08", "2007-09", "2007-10", "2007-11", "2007-12", "2008-01", "2008-02", "2008-03", "2008-04", "2008-05", "2008-06", "2008-07", "2008-08", "2008-09", "2008-10", "2008-11", "2008-12", "2009-01", "2009-02", "2009-03", "2009-04", "2009-05", "2009-06", "2009-07", "2009-08", "2009-09", "2009-10", "2009-11", "2009-12", "2010-01", "2010-02", "2010-03", "2010-04", "2010-05", "2010-06", "2010-07", "2010-08", "2010-09", "2010-10", "2010-11", "2010-12", "2011-01", "2011-02", "2011-03", "2011-04", "2011-05", "2011-06", "2011-07", "2011-08", "2011-09", "2011-10", "2011-11", "2011-12", "2012-01", "2012-02", "2012-03", "2012-04", "2012-05", "2012-06", "2012-07", "2012-08", "2012-09", "2012-10", "2012-11", "2012-12", "2013-01", "2013-02", "2013-03", "2013-04", "2013-05", "2013-06", "2013-07", "2013-08", "2013-09", "2013-10", "2013-11", "2013-12", "2014-01", "2014-02", "2014-03", "2014-04", "2014-05", "2014-06", "2014-07", "2014-08", "2014-09", "2014-10", "2014-11", "2014-12", "2015-01", "2015-02", "2015-03", "2015-04", "2015-05", "2015-06", "2015-07", "2015-08", "2015-09", "2015-10", "2015-11", "2015-12", "2016-01", "2016-02", "2016-03", "2016-04", "2016-05", "2016-06", "2016-07", "2016-08", "2016-09", "2016-10", "2016-11", "2016-12", "2017-01", "2017-02", "2017-03", "2017-04", "2017-05", "2017-06", "2017-07", "2017-08", "2017-09", "2017-10", "2017-11", "2017-12", "2018-01", "2018-02", "2018-03", "2018-04", "2018-05", "2018-06", "2018-07", "2018-08", "2018-09", "2018-10", "2018-11", "2018-12", "2019-01", "2019-02", "2019-03", "2019-04", "2019-05", "2019-06", "2019-07", "2019-08", "2019-09", "2019-10", "2019-11", "2019-12", "2020-01", "2020-02", "2020-03", "2020-04", "2020-05", "2020-06", "2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12", "2021-01", "2021-02", "2021-03", "2021-04", "2021-05", "2021-06", "2021-07", "2021-08", "2021-09", "2021-10", "2021-11", "2021-12", "2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09"], "v65": [null, -1.9417, -0.9901, 8.0, 8.3333, 4.2735, -1.6393, 1.6667, 13.1148, -2.1739, -12.5926, 7.6271, 11.0236, 4.9645, -6.0811, -0.7194, 8.6957, 15.3333, -1.7341, -8.8235, 3.871, -15.528, 11.7647, 7.8947, 5.4878, 1.1561, -2.2857, 8.1871, 9.7297, 5.4187, 9.3458, 18.8034, 6.8345, -15.8249, 4.8, 3.4351, -5.5351, 5.4688, 2.2222, 1.4493, -1.7857, 2.1818, -4.6263, 5.2239, 0.7092, 10.5634, 1.9108, -1.25, 9.1772, 1.1594, 4.0115, -3.0303, -2.2727, -7.2674, -2.5078, 15.4341, -10.8635, 5.9375, 1.4749, -4.0698, 6.9697, 4.8159, 9.7297, -1.7241, -10.5263, 2.521, 1.0929, -3.5135, 5.042, 1.8667, 3.9267, 5.0378, 20.6235, 1.9881, 10.1365, 8.8496, 4.2276, 9.3604, 8.5592, 1.8397, 10.8387, -9.1967, 0.1282, 4.0973, -8.7331, 11.4555, -5.925, -6.8123, -2.7586, 6.383, -5.4667, 4.3724, -4.4595, -10.6082, 3.0063, -4.3011, 0.0, 3.0498, 7.1651, -0.5814, 1.462, 0.7205, -6.7239, 0.4601, -1.8321, 4.1991, -1.9403, -0.6088, -5.2067, 10.8239, 2.4781, 11.522, -11.8622, -1.7366, 0.8837, 7.2993, 0.0, 0.4082, 4.2005, 5.5917, 0.6158, -3.1824, -0.5057, -0.8895, 3.5897, 1.1139, 5.3856, -0.1161, 2.5581, 3.4014, 8.2237, -0.7092, -0.5102, -3.2821, -6.8929, -0.9112, 8.3908, 4.3478, -2.7439, 22.466, 7.2526, -13.2856, 0.367, 4.936, 2.9617, 2.7919, 2.0576, 2.0161, -7.3518, 1.1092, 3.3755, 5.7959, -8.4105, 1.7692, 4.9669, 2.2082, 13.4259, -0.2041, 1.7723, 7.0998, 2.5641, 3.4146, 38.4434, 4.5571, 5.5804, 6.0957, 9.2727, 2.629, 0.4864, 7.3572, -13.8864, -1.2216, 7.3852, -7.667, 13.9701, 3.8149, 1.0843, 6.4064, -8.485, -5.4468, -16.4078, 6.1556, 1.2764, -2.0886, -3.2733, -1.5589, -2.5879, -2.3791, -1.6653, -1.7761, 12.6156, 0.0747, 2.3507, -4.8852, -1.4565, 2.0226, 18.0328, 5.9432, 13.5976, -1.3151, -15.3658, 7.3586, -0.0898, 6.2612, -11.4745, 6.8471, 7.3323, -1.9161, 16.3647, -11.1192, -6.3236, 2.1625, 8.2094, 8.5646, 29.8028, 3.5453, 3.4783, -1.5756, 12.5044, 5.2648, 0.8111, 10.7122, 9.6219, -4.3825, 11.6831, 20.738, 11.6919, 8.0471, 33.1992, 29.0647, -21.8265, 3.7513, 13.7102, 8.5689, -23.3385, 0.6278, -1.6458], "tlt": [0.0, 2.7, -0.5, 5.1, 0.5, 6.2, 0.5, 0.0, 12.3, 12.7, -2.7, -1.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2.4, 9.7, 1.7, 15.7, -8.5, 7.2, 4.9, -6.9, 14.6, 7.7, 7.0, -7.5, -0.9, 0.0, 0.0, 0.0, 4.6, -0.2, 1.8, 3.3, 2.0, 2.7, 2.4, -0.6, 2.5, 5.1, 2.5, 0.0, 0.0, 0.0, 0.0, 4.0, 7.0, 6.8, 0.1, -0.7, 2.2, 1.2, 1.5, 2.8, -8.7, 4.8, 0.5, 5.5, 8.2, 8.2, 0.5, 9.1, 3.5, 5.8, 7.7, 11.7, -5.4, 3.6, 3.6, 10.8, 11.3, -8.6, 2.0, 9.2, 7.8, -6.9, 7.2, 0.0, 2.8, 2.1, -1.2, 3.0, 10.6, 0.2, -3.7, 8.5, -2.8, 1.3, -5.1, -2.7, 0.0, 7.5, 0.4, -2.7, 0.0, 0.0, -2.4, 9.9, 1.3, 10.5, 4.0, 8.1, 0.8, 10.5, 0.6, 11.5, -0.9, 6.8, 3.3, 10.7, 0.0, -1.0, 3.6, 2.2, 9.5, -0.66, -6.36, 12.6, 2.3, 5.59, -8.83, 6.85, 2.87, 1.31, 8.76, 1.09, -20.14, 0.34, 0.0, 0.0, 0.0, 4.67, 3.92, -3.01, 1.03, -1.85, 0.07, -4.3, 3.6, 0.09, 6.81, -4.56, -0.86, 2.98, 0.0, 0.0, 18.06, 11.62, 29.88, -0.49, -5.76, 16.92, 7.97, 4.69, -7.67, -12.39, 11.51, -0.41, 8.45, 15.98, 6.57, -3.31, 5.59, -3.02, -8.79, -20.69, 5.82, -0.29, -5.24, -0.1, 0.0, 0.0, -4.53, -2.52, 0.0, 2.56, -4.41, 1.26, -7.63, -1.12, -4.82, 6.59, 9.7, 3.47, -5.68, -2.71, 0.0, 3.27, 6.89, 3.68, 11.71, -0.64, -3.72, 14.91, 3.26, -3.71, 0.76, 1.79, 2.89, 10.03, -0.29, -2.61, -4.42, -12.05, 5.5, 6.51, 3.91, -6.67, 3.44, 16.2, 1.43, -9.9, 4.28, 16.0, 0.22, -3.51, 31.17, 30.71, 22.35, -25.96, -1.91, -0.94], "momo": [0.5, -0.4, 2.2, 3.9, 7.5, -0.1, -3.3, -0.7, 5.6, 7.7, -11.0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 7.7, 2.2, 8.9, -6.0, 3.9, 4.8, -1.9, 7.2, 7.6, 3.5, -6.4, -0.9, 0.0, 0.0, 0.0, 6.1, 5.3, 1.2, 2.7, 5.3, 1.1, 4.4, 4.0, -1.5, -4.7, 1.5, 0.0, 0.0, 0.0, 0.0, 0.5, 4.6, 4.0, 4.5, 1.5, 1.1, 1.5, 2.9, 4.3, -1.7, 3.7, -1.2, 7.8, 5.0, 7.7, 2.2, 2.0, 0.7, 6.5, -2.8, 9.0, 5.5, 2.8, 2.1, -1.7, 5.7, 0.1, 1.6, 4.8, 5.2, -2.6, 6.9, -0.5, -0.3, 9.7, 1.2, 3.6, 3.4, 3.2, -6.5, 4.8, 0.3, 1.4, -8.4, -2.1, 0.0, 0.1, -0.2, -2.13, 0.0, 0.0, -2.03, 1.85, 5.42, 3.76, -5.24, 3.24, -4.88, 10.12, 3.59, 0.68, 2.37, 0.76, -0.95, 0.02, -1.35, -0.32, -0.2, 3.35, 4.69, 4.48, 0.3, 3.07, -5.63, -1.24, -0.54, 0.0, 1.35, -0.72, 5.85, -0.37, -16.2, 0.43, 0.0, 0.0, 0.0, 2.02, 0.91, -3.86, 0.47, 1.09, 0.89, -0.08, -0.15, 1.3, 0.0, -0.77, -6.26, 0.53, 0.0, 0.0, 3.14, 13.1, 4.28, 4.58, -0.63, 23.68, 5.39, 2.52, 11.9, 2.78, 6.6, 4.86, -3.08, -4.12, -0.07, -1.99, 6.35, 0.58, 7.54, -1.73, 4.31, 1.74, -3.91, -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -7.87, -0.72, 1.53, 6.22, -9.17, -1.06, 0.02, 7.39, -4.26, -9.89, 0.14, 0.0, 11.13, 4.06, 14.66, 6.27, -3.75, 7.46, -1.41, -4.7, 10.1, 5.94, 4.0, 31.3, -9.52, 1.02, -3.23, 0.47, 0.1, 0.0, 13.2, 6.6, 0.0, 3.9, 1.7, -4.0, -1.3, 3.4, 6.6, -6.7, 1.2, 9.6, 14.7, -8.8, -2.8, null]};
+const DATA = {"labels": ["2007-01", "2007-02", "2007-03", "2007-04", "2007-05", "2007-06", "2007-07", "2007-08", "2007-09", "2007-10", "2007-11", "2007-12", "2008-01", "2008-02", "2008-03", "2008-04", "2008-05", "2008-06", "2008-07", "2008-08", "2008-09", "2008-10", "2008-11", "2008-12", "2009-01", "2009-02", "2009-03", "2009-04", "2009-05", "2009-06", "2009-07", "2009-08", "2009-09", "2009-10", "2009-11", "2009-12", "2010-01", "2010-02", "2010-03", "2010-04", "2010-05", "2010-06", "2010-07", "2010-08", "2010-09", "2010-10", "2010-11", "2010-12", "2011-01", "2011-02", "2011-03", "2011-04", "2011-05", "2011-06", "2011-07", "2011-08", "2011-09", "2011-10", "2011-11", "2011-12", "2012-01", "2012-02", "2012-03", "2012-04", "2012-05", "2012-06", "2012-07", "2012-08", "2012-09", "2012-10", "2012-11", "2012-12", "2013-01", "2013-02", "2013-03", "2013-04", "2013-05", "2013-06", "2013-07", "2013-08", "2013-09", "2013-10", "2013-11", "2013-12", "2014-01", "2014-02", "2014-03", "2014-04", "2014-05", "2014-06", "2014-07", "2014-08", "2014-09", "2014-10", "2014-11", "2014-12", "2015-01", "2015-02", "2015-03", "2015-04", "2015-05", "2015-06", "2015-07", "2015-08", "2015-09", "2015-10", "2015-11", "2015-12", "2016-01", "2016-02", "2016-03", "2016-04", "2016-05", "2016-06", "2016-07", "2016-08", "2016-09", "2016-10", "2016-11", "2016-12", "2017-01", "2017-02", "2017-03", "2017-04", "2017-05", "2017-06", "2017-07", "2017-08", "2017-09", "2017-10", "2017-11", "2017-12", "2018-01", "2018-02", "2018-03", "2018-04", "2018-05", "2018-06", "2018-07", "2018-08", "2018-09", "2018-10", "2018-11", "2018-12", "2019-01", "2019-02", "2019-03", "2019-04", "2019-05", "2019-06", "2019-07", "2019-08", "2019-09", "2019-10", "2019-11", "2019-12", "2020-01", "2020-02", "2020-03", "2020-04", "2020-05", "2020-06", "2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12", "2021-01", "2021-02", "2021-03", "2021-04", "2021-05", "2021-06", "2021-07", "2021-08", "2021-09", "2021-10", "2021-11", "2021-12", "2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09"], "v65": [null, -1.9417, -0.9901, 8.0, 8.3333, 4.2735, -1.6393, 1.6667, 13.1148, -2.1739, -12.5926, 7.6271, 11.0236, 4.9645, -6.0811, -0.7194, 8.6957, 15.3333, -1.7341, -8.8235, 3.871, -15.528, 11.7647, 7.8947, 5.4878, 1.1561, -2.2857, 8.1871, 9.7297, 5.4187, 9.3458, 18.8034, 6.8345, -15.8249, 4.8, 3.4351, -5.5351, 5.4688, 2.2222, 1.4493, -1.7857, 2.1818, -4.6263, 5.2239, 0.7092, 10.5634, 1.9108, -1.25, 9.1772, 1.1594, 4.0115, -3.0303, -2.2727, -7.2674, -2.5078, 15.4341, -10.8635, 5.9375, 1.4749, -4.0698, 6.9697, 4.8159, 9.7297, -1.7241, -10.5263, 2.521, 1.0929, -3.5135, 5.042, 1.8667, 3.9267, 5.0378, 20.6235, 1.9881, 10.1365, 8.8496, 4.2276, 9.3604, 8.5592, 1.8397, 10.8387, -9.1967, 0.1282, 4.0973, -8.7331, 11.4555, -5.925, -6.8123, -2.7586, 6.383, -5.4667, 4.3724, -4.4595, -10.6082, 3.0063, -4.3011, 0.0, 3.0498, 7.1651, -0.5814, 1.462, 0.7205, -6.7239, 0.4601, -1.8321, 4.1991, -1.9403, -0.6088, -5.2067, 10.8239, 2.4781, 11.522, -11.8622, -1.7366, 0.8837, 7.2993, 0.0, 0.4082, 4.2005, 5.5917, 0.6158, -3.1824, -0.5057, -0.8895, 3.5897, 1.1139, 5.3856, -0.1161, 2.5581, 3.4014, 8.2237, -0.7092, -0.5102, -3.2821, -6.8929, -0.9112, 8.3908, 4.3478, -2.7439, 22.466, 7.2526, -13.2856, 0.367, 4.936, 2.9617, 2.7919, 2.0576, 2.0161, -7.3518, 1.1092, 3.3755, 5.7959, -8.4105, 1.7692, 4.9669, 2.2082, 13.4259, -0.2041, 1.7723, 7.0998, 2.5641, 3.4146, 38.4434, 4.5571, 5.5804, 6.0957, 9.2727, 2.629, 0.4864, 7.3572, -13.8864, -1.2216, 7.3852, -7.667, 13.9701, 3.8149, 1.0843, 6.4064, -8.485, -5.4468, -16.4078, 6.1556, 1.2764, -2.0886, -3.2733, -1.5589, -2.5879, -2.3791, -1.6653, -1.7761, 12.6156, 0.0747, 2.3507, -4.8852, -1.4565, 2.0226, 18.0328, 5.9432, 13.5976, -1.3151, -15.3658, 7.3586, -0.0898, 6.2612, -11.4745, 6.8471, 7.3323, -1.9161, 16.3647, -11.1192, -6.3236, 2.1625, 8.2094, 8.5646, 29.8028, 3.5453, 3.4783, -1.5756, 12.5044, 5.2648, 0.8111, 10.7122, 9.6219, -4.3825, 11.6831, 20.738, 11.6919, 8.0471, 33.1992, 29.0647, -21.8265, 3.7513, 13.7102, 8.5689, -23.3385, 0.6278, -1.6458], "tlt": [0.0, 2.7, -0.5, 5.1, 0.5, 6.2, 0.5, 0.0, 12.3, 12.7, -2.7, -1.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2.4, 9.7, 1.7, 15.7, -8.5, 7.2, 4.9, -6.9, 14.6, 7.7, 7.0, -7.5, -0.9, 0.0, 0.0, 0.0, 4.6, -0.2, 1.8, 3.3, 2.0, 2.7, 2.4, -0.6, 2.5, 5.1, 2.5, 0.0, 0.0, 0.0, 0.0, 4.0, 7.0, 6.8, 0.1, -0.7, 2.2, 1.2, 1.5, 2.8, -8.7, 4.8, 0.5, 5.5, 8.2, 8.2, 0.5, 9.1, 3.5, 5.8, 7.7, 11.7, -5.4, 3.6, 3.6, 10.8, 11.3, -8.6, 2.0, 9.2, 7.8, -6.9, 7.2, 0.0, 2.8, 2.1, -1.2, 3.0, 10.6, 0.2, -3.7, 8.5, -2.8, 1.3, -5.1, -2.7, 0.0, 7.5, 0.4, -2.7, 0.0, 0.0, -2.4, 9.9, 1.3, 10.5, 4.0, 8.1, 0.8, 10.5, 0.6, 11.5, -0.9, 6.8, 3.3, 10.7, 0.0, -1.0, 3.6, 2.2, 9.5, -0.66, -6.36, 12.6, 2.3, 5.59, -8.83, 6.85, 2.87, 1.31, 8.76, 1.09, -20.14, 0.34, 0.0, 0.0, 0.0, 4.67, 3.92, -3.01, 1.03, -1.85, 0.07, -4.3, 3.6, 0.09, 6.81, -4.56, -0.86, 2.98, 0.0, 0.0, 18.06, 11.62, 29.88, -0.49, -5.76, 16.92, 7.97, 4.69, -7.67, -12.39, 11.51, -0.41, 8.45, 15.98, 6.57, -3.31, 5.59, -3.02, -8.79, -20.69, 5.82, -0.29, -5.24, -0.1, 0.0, 0.0, -4.53, -2.52, 0.0, 2.56, -4.41, 1.26, -7.63, -1.12, -4.82, 6.59, 9.7, 3.47, -5.68, -2.71, 0.0, 3.27, 6.89, 3.68, 11.71, -0.64, -3.72, 14.91, 3.26, -3.71, 0.76, 1.79, 2.89, 10.03, -0.29, -2.61, -4.42, -12.05, 5.5, 6.51, 3.91, -6.67, 3.44, 16.2, 1.43, -9.9, 4.28, 16.0, 0.22, -3.51, 31.17, 30.71, 22.35, -25.96, -1.91, -0.94], "momo": [0.5, -0.4, 2.2, 3.9, 7.5, -0.1, -3.3, -0.7, 5.6, 7.7, -11.0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 7.7, 2.2, 8.9, -6.0, 3.9, 4.8, -1.9, 7.2, 7.6, 3.5, -6.4, -0.9, 0.0, 0.0, 0.0, 6.1, 5.3, 1.2, 2.7, 5.3, 1.1, 4.4, 4.0, -1.5, -4.7, 1.5, 0.0, 0.0, 0.0, 0.0, 0.5, 4.6, 4.0, 4.5, 1.5, 1.1, 1.5, 2.9, 4.3, -1.7, 3.7, -1.2, 7.8, 5.0, 7.7, 2.2, 2.0, 0.7, 6.5, -2.8, 9.0, 5.5, 2.8, 2.1, -1.7, 5.7, 0.1, 1.6, 4.8, 5.2, -2.6, 6.9, -0.5, -0.3, 9.7, 1.2, 3.6, 3.4, 3.2, -6.5, 4.8, 0.3, 1.4, -8.4, -2.1, 0.0, 0.1, -0.2, -2.13, 0.0, 0.0, -2.03, 1.85, 5.42, 3.76, -5.24, 3.24, -4.88, 10.12, 3.59, 0.68, 2.37, 0.76, -0.95, 0.02, -1.35, -0.32, -0.2, 3.35, 4.69, 4.48, 0.3, 3.07, -5.63, -1.24, -0.54, 0.0, 1.35, -0.72, 5.85, -0.37, -16.2, 0.43, 0.0, 0.0, 0.0, 2.02, 0.91, -3.86, 0.47, 1.09, 0.89, -0.08, -0.15, 1.3, 0.0, -0.77, -6.26, 0.53, 0.0, 0.0, 3.14, 13.1, 4.28, 4.58, -0.63, 23.68, 5.39, 2.52, 11.9, 2.78, 6.6, 4.86, -3.08, -4.12, -0.07, -1.99, 6.35, 0.58, 7.54, -1.73, 4.31, 1.74, -3.91, -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -7.87, -0.72, 1.53, 6.22, -9.17, -1.06, 0.02, 7.39, -4.26, -9.89, 0.14, 0.0, 11.13, 4.06, 14.66, 6.27, -3.75, 7.46, -1.41, -4.7, 10.1, 5.94, 4.0, 31.3, -9.52, 1.02, -3.23, 0.47, 0.1, 0.0, 13.2, 6.6, 0.0, 3.9, 1.7, -4.0, -1.3, 3.4, 6.6, -6.7, 1.2, 9.6, 14.7, -8.8, -2.8, null], "ushf": [0.3, -1.6, 0.5, 6.1, 6.9, -0.8, -2.0, 6.0, 5.1, 9.6, -3.4, 2.3, -8.0, 7.6, 17.0, 6.3, 3.0, -1.7, 14.0, 1.2, 9.5, -16.1, -0.9, 2.1, -1.5, -1.9, 6.2, 11.0, 1.7, 6.5, 3.1, 6.8, 1.1, 7.0, 3.5, 7.6, -0.9, 6.7, 5.3, 8.4, 8.8, -8.4, 6.1, 1.7, 9.2, 7.4, 6.7, 6.8, 7.9, 0.7, 14.4, 2.8, 3.3, -1.2, -4.1, -14.5, 2.0, 5.3, 5.8, 2.3, 7.2, 5.6, 2.7, -1.3, -3.4, 1.9, 3.0, 3.5, 3.1, -1.0, 2.4, 0.5, 0.55, 1.96, 4.07, 2.52, -5.1, 4.88, 2.15, -1.87, 3.52, 2.22, 4.17, 3.73, -3.79, 0.07, 6.33, 4.45, 0.65, 2.92, 0.46, 2.91, -0.86, -1.64, 2.1, -2.28, 0.48, 0.02, -0.39, 4.98, 2.37, 3.32, 0.26, 0.85, 0.0, 0.71, 0.93, 0.69, -3.19, 0.0, 1.8, 1.22, 0.36, -1.9, 4.32, -0.06, -0.55, -2.18, 0.02, 3.5, 0.7, 2.89, -0.65, -0.77, 0.69, 3.93, -3.67, -4.3, 0.98, 1.47, -0.42, -1.21, 0.56, -3.8, 1.0, -0.69, -3.35, -1.2, 0.99, 0.8, 3.53, -8.3, -0.28, -9.55, 7.3, 2.5, 1.9, 2.1, -7.3, 2.0, 2.1, -4.9, 2.1, 5.0, 4.9, 1.1, 2.1, -15.5, -2.3, 2.5, 18.1, 10.45, 11.2, 5.1, 3.2, -2.5, 11.6, 8.0, -2.9, 1.5, 8.4, -1.6, -5.1, 2.8, 3.3, -2.5, -6.9, 0.3, 2.6, 7.8, -4.6, 1.7, 0.2, -2.8, 0.0, -19.5, 8.4, 0.3, -4.4, 4.0, 14.2, -3.3, 11.4, -1.0, -12.3, -2.5, -1.2, 3.0, 4.6, -3.7, -9.6, 0.0, 3.0, 1.9, -3.8, 15.0, 3.7, -3.7, 5.6, 1.2, 4.9, -4.5, 1.5, 4.2, 2.4, -2.3, 1.3, -3.0, -1.3, 0.0, 1.8, 7.6, 6.8, 3.7, 0.9, 7.3, 2.7, -3.9, 1.9, 2.0, -6.0, 8.0, 5.2, 0.2, 22.4, 14.4, null], "usaw": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -0.4, -0.4, -3.6, 0.2, 1.6, 1.9, -0.9, 3.2, -1.0, 1.6, 1.9, -0.5, -0.6, 0.7, -0.9, 0.8, 0.3, -1.3, 2.4, -4.0, -0.7, -0.1, 1.5, 0.9, -3.1, 3.8, -0.7, 2.7, 0.7, 4.0, 3.1, -0.9, 2.1, -0.4, 3.5, 3.9, 1.9, 3.9, -0.5, 3.3, 8.1, 0.1, 2.9, 7.7, -1.8, 7.0, 6.6, 6.1, 1.2, -1.3, -4.4, -0.2, 1.6, -0.4, 0.3, 2.2, 0.0, -5.7, 0.3, 0.2, 0.7, -0.2, 1.2, 2.6, 1.7, 8.5, -1.9, 0.5, -2.3, 2.9, -0.2, 2.3, 0.2, -4.0, -1.6, 0.8, 3.6, 2.2, 7.4, 4.8, -4.6, 1.7, 12.4, 8.6, 1.6, 7.9, 3.7, 3.2, -2.2, 0.8, 0.4, 1.6, -3.3, 3.3, -1.1, -0.7, -4.1, 1.4, 0.3, -0.4, -0.1, -0.6, -0.2, 0.0, 0.0, 0.2, 0.3, -4.2, 1.9, -2.0, 6.5, -0.1, 1.6, 5.0, 2.4, -2.8, -2.7, -0.6, 1.5, 5.7, 3.12, 8.3, 4.11, -3.49, 1.46, 1.3, 1.7, 0.6, 3.3, 0.8, 6.2, -1.5, 2.0, -1.4, 2.1, 1.8, 1.2, 3.5, 1.1, 1.7, 5.2, 2.0, -0.8, 0.0, 4.3, 2.2, -3.9, 1.0, 2.8, -3.2, -0.4, 2.3, null], "aumomo": [-3.4, 1.3, 0.2, 2.2, 0.4, -1.8, -0.5, -2.6, 0.8, 7.4, 3.2, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 4.5, -0.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -6.1, 8.4, 5.2, 2.3, 5.3, -4.3, 9.8, -0.3, 0.0, 2.6, -0.2, 3.5, -10.2, -0.3, 0.0, 0.0, 2.9, 3.4, 7.5, 14.3, -8.3, 10.7, 12.9, 0.0, 7.0, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 3.9, 0.7, 0.0, 8.5, 0.8, -4.2, -0.7, 0.0, 3.4, 6.7, 2.1, 1.4, -0.8, 2.8, 7.1, 1.5, 3.2, -1.9, -4.3, -0.7, 0.0, 4.4, 9.7, 2.9, 4.8, 0.5, 8.0, 1.1, -1.1, 0.3, -1.7, 3.7, -1.8, -1.4, -0.7, 0.0, 10.9, -0.3, 8.8, 4.3, -1.0, 0.8, -1.0, 0.0, 0.0, 0.0, 0.0, 4.3, 5.7, 0.0, 0.0, 0.0, 4.2, 6.4, -4.8, 11.0, -1.5, -3.5, 0.5, 5.6, 2.6, 6.6, 2.4, -1.7, -1.9, 0.5, 4.4, -0.1, 1.8, 0.6, 3.8, -2.8, 2.0, 0.5, 10.3, -2.6, -2.6, 0.5, 4.1, 0.0, 2.4, -3.6, -12.3, 1.1, 0.0, 0.0, 0.0, 5.3, 1.9, 3.9, 13.1, 6.4, -4.7, -2.9, -7.3, 11.0, -0.1, 9.9, -11.6, -1.6, 0.0, 0.0, 10.7, 11.2, 14.6, -6.2, 8.8, 0.18, 15.85, -3.29, 2.94, -6.35, 9.41, 2.26, 5.03, 5.67, -5.06, -10.26, -3.83, 1.69, 14.54, -8.88, 1.35, 0.0, 0.0, 2.36, -3.3, 0.0, 0.0, 4.91, -1.05, 0.0, -6.57, 5.24, -10.63, -2.77, 1.06, 0.0, 2.22, -0.92, -6.98, -9.8, -1.54, 0.0, 0.0, 0.7, 8.67, 0.86, -7.01, -1.6, 2.38, -0.14, -1.56, 8.41, 1.33, 16.36, -1.09, -0.25, -8.6, 0.4, 0.0, 13.4, -4.2, 11.86, 3.2, -0.4, -6.2, 3.6, 0.05, 0.0, 11.1, -14.92, 5.8, 1.29, 0.0, 0.0, 12.1, null], "auaw": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.0, 2.0, -2.1, 0.0, 1.1, 1.3, 0.9, 1.4, 4.1, 0.9, 4.4, 1.8, 5.0, 0.4, 1.8, -3.5, 4.8, -1.9, 3.5, 0.1, -1.9, 5.0, -4.9, -0.8, -3.9, 5.1, -2.0, 1.3, 4.2, 1.5, 1.9, -0.8, -1.3, -3.9, -2.2, 4.0, -1.3, 2.0, 0.7, 4.2, 1.7, -2.7, -0.3, 1.0, 1.1, 3.9, 2.3, -1.3, 1.7, 1.5, -1.3, 3.1, 7.2, 1.1, -0.1, 4.9, 0.1, -4.5, -0.9, 0.0, 2.3, 3.8, 1.0, 1.6, -2.2, 4.7, 2.4, 4.2, -2.0, -0.6, 2.3, 0.4, 8.2, -2.1, 2.2, 4.8, 0.1, -0.7, 3.7, 1.7, -2.4, -0.6, -0.8, 1.3, 0.1, -4.1, 2.4, 2.5, 0.8, 4.4, 0.4, 3.4, -1.4, -0.5, 5.3, -0.4, -1.0, -1.5, 0.6, 1.2, -2.5, -0.4, -1.0, -0.2, 1.1, 2.5, 0.8, 0.9, -1.0, 0.1, 4.8, 4.2, 0.3, -0.4, 2.6, 2.0, -4.0, 2.8, 2.6, 0.2, 5.1, 2.81, 4.7, 0.83, 0.44, 4.07, 2.42, -1.9, 3.7, 5.2, 0.8, 2.8, 4.3, -1.1, -0.7, 0.4, 3.8, 1.1, 3.6, 0.9, 6.5, 5.9, 1.0, -0.4, 3.7, -2.9, -7.1, 4.6, 4.8, -2.5, -1.7, 3.4, null], "augrowth": [4.5, -2.6, 1.8, 5.0, 0.8, 1.7, 2.3, -11.2, 2.2, 3.3, 1.4, 3.8, -9.4, 1.3, -0.1, 0.2, 10.5, 1.0, -5.3, -0.7, 1.6, 0.1, -0.2, 0.0, 0.0, 0.0, 0.8, 1.2, 6.1, -1.4, 5.9, 10.4, 10.4, -1.6, 6.0, 1.3, -4.6, 3.3, 1.1, -2.4, -9.9, 0.1, -0.1, -2.7, 6.8, 1.3, 4.6, 8.8, 5.1, 2.3, 10.0, -0.4, 2.2, -2.6, 1.0, -3.2, 0.0, -0.4, -4.0, 1.5, 5.2, 12.4, 5.0, 1.3, -6.9, 1.3, 2.1, 3.6, 0.1, 5.0, 1.1, 4.4, 3.6, 5.9, -0.2, 7.0, -9.7, -1.1, 1.6, 2.0, 6.2, 3.7, -0.1, 2.6, -0.4, 1.6, 5.9, -1.6, 6.4, -1.6, 2.1, -2.9, 0.3, 4.9, 2.0, 2.0, 0.6, 4.0, 0.8, 0.7, 1.1, -2.6, 0.3, -3.2, 1.2, 0.4, 4.0, 2.4, -5.3, 0.0, 4.4, 2.3, 6.3, 0.5, 9.9, -3.0, 3.1, -2.6, -4.5, 0.9, 0.1, 6.7, -3.0, -0.5, -0.3, -2.3, -0.9, 3.5, 2.8, 2.6, 0.5, 0.9, 3.1, -1.7, 2.3, -0.7, 8.3, -0.4, 1.5, 1.2, -1.4, -6.7, -0.6, 0.0, 0.7, 2.8, 2.9, 12.6, 0.2, -4.9, 5.8, -0.7, 4.2, 9.8, 0.6, 0.3, 6.7, -7.9, -5.4, 0.0, -0.4, 5.3, -0.1, 4.0, 4.9, -0.2, 6.8, 4.2, 1.1, 11.5, -5.4, 2.8, 1.6, 5.8, 0.1, 7.4, -2.6, 4.7, -2.4, 1.7, -11.9, 0.3, 1.1, 1.7, -1.4, -2.4, 0.0, 1.8, -13.3, -6.3, 2.2, -3.5, 5.4, -2.5, 1.1, 1.6, -0.8, 0.4, 0.0, -2.4, 0.4, -1.2, -0.7, 3.0, -0.2, 12.9, 1.7, -1.8, 3.9, 4.9, 0.2, -1.8, 8.1, 8.5, 2.2, -3.8, 2.1, -0.6, -5.9, -2.9, -6.6, 10.5, -3.6, 16.6, 1.7, -0.4, 0.7, 2.2, 0.2, -4.2, -10.4, 1.8, -2.5, 2.0, -6.2, -5.2, null], "augrowthdef": [7.7, 6.6, 4.9, 9.1, 0.2, -0.5, -1.1, 0.0, 0.6, 1.3, -1.9, 2.7, 0.0, 0.0, 0.0, 0.0, 10.6, 1.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.8, 1.3, 4.4, -1.1, -0.1, 11.6, 7.2, -6.4, -2.2, -3.6, -2.5, 0.2, -0.5, -1.3, -0.7, 0.0, 0.0, -3.4, 0.8, 5.4, -0.1, 13.0, 0.5, 9.1, 1.7, -0.6, 0.4, 0.0, 0.0, 0.0, 0.0, -0.7, -0.8, -0.1, -1.2, 5.3, 6.4, 1.1, -6.2, 0.0, 0.0, -0.2, 3.8, 7.1, 0.9, 2.1, 6.9, 5.6, 1.9, 0.2, -1.0, 0.0, 1.2, 3.0, 6.0, 2.8, 3.6, -1.2, -1.0, 0.2, 6.1, 1.6, 6.7, 7.9, 0.2, -2.3, 1.4, 0.0, 0.2, 0.1, 0.0, 1.8, 5.9, 4.6, 0.4, 0.0, -0.3, 0.0, 0.0, -1.4, 1.6, 0.8, 0.3, 0.0, 0.4, 2.2, 2.1, 7.4, 4.9, 0.2, 1.8, 1.9, 0.0, 0.8, 0.1, 8.6, -4.8, -1.5, 2.3, 0.0, 0.0, 0.6, -0.9, 2.6, 0.8, 5.9, 3.9, -6.5, -0.5, 0.0, 0.3, -3.0, 3.8, 8.0, -2.6, 0.3, 0.0, 0.0, 0.7, 2.8, 2.9, 12.4, -0.9, -1.5, 5.6, -8.6, 4.6, 2.9, -0.9, -2.9, 1.1, -0.9, 0.0, 0.0, -0.4, 5.3, 1.6, 0.5, 4.4, -1.6, 3.1, 11.8, 3.3, 14.2, 0.4, 0.1, 6.9, 3.2, -0.9, 8.7, -3.2, 0.6, 0.0, 0.0, -6.3, 0.0, -1.0, 0.8, -0.5, 0.0, 0.0, 1.8, -6.0, -5.5, 0.3, -3.6, 4.7, -2.9, 0.0, -0.2, 0.9, 0.0, -0.1, -2.6, -0.7, 0.0, -0.5, 1.2, 0.2, 12.9, 1.7, -3.0, -3.6, 1.8, 2.3, -7.9, 0.9, 9.0, -3.3, -6.1, 0.0, -4.6, 0.0, 0.1, -6.5, 9.9, -1.1, 16.7, 4.5, 5.5, -5.0, 0.0, -3.3, -2.6, -9.7, -0.6, -13.6, 0.0, 0.0, -4.1, null]};
 
-let W=[34,33,33]; // v65, tlt, momo
+const PORTFOLIOS = [
+  {key:'v65', label:'ChowMo', color:'--v65', enabled:true},
+  {key:'tlt', label:'US TLT', color:'--tlt', enabled:true},
+  {key:'momo', label:'US Momo', color:'--momo', enabled:true},
+  {key:'ushf', label:'US High Freq', color:'--ushf', enabled:false},
+  {key:'usaw', label:'US All Weather', color:'--usaw', enabled:false},
+  {key:'aumomo', label:'AU Momo', color:'--aumomo', enabled:false},
+  {key:'auaw', label:'AU All Weather', color:'--auaw', enabled:false},
+  {key:'augrowth', label:'AU Growth', color:'--augrowth', enabled:false},
+  {key:'augrowthdef', label:'AU Growth Defensive', color:'--augrowthdef', enabled:false},
+];
+function enabledPortfolios(){ return PORTFOLIOS.filter(p=>p.enabled); }
+function enabledKeys(){ return enabledPortfolios().map(p=>p.key); }
+function portfolioByKey(k){ return PORTFOLIOS.find(p=>p.key===k); }
 
-function normalizeFrom(idx, val){
-  val = Math.max(0, Math.min(100, val));
-  const others = [0,1,2].filter(i=>i!==idx);
+let W={}; PORTFOLIOS.forEach(p=>W[p.key]=0); W.v65=34; W.tlt=33; W.momo=33;
+
+// water-fill `total` across keysList proportional to current W[], clamping every share to [0,100]
+function distribute(keysList, total){
+  total = Math.max(0, Math.min(keysList.length*100, total));
+  let free = keysList.slice();
+  let freeTotal = total;
+  const result = {};
+  while(free.length){
+    const wSum = free.reduce((s,k)=>s+W[k],0);
+    const shares = {};
+    free.forEach(k=>{ shares[k] = wSum>0 ? freeTotal*(W[k]/wSum) : freeTotal/free.length; });
+    const overflow = free.filter(k=>shares[k]>100);
+    if(overflow.length){
+      overflow.forEach(k=>{ result[k]=100; freeTotal-=100; });
+      free = free.filter(k=>!overflow.includes(k));
+      continue;
+    }
+    free.forEach(k=>result[k]=shares[k]);
+    free=[];
+  }
+  return result;
+}
+
+// round every key to an integer and patch the +-1 rounding drift onto keys that still have headroom,
+// never pushing anything outside [0,100] and never touching lockedKey (the slider being dragged)
+function fixRoundingDrift(keys, target, lockedKey){
+  keys.forEach(k=>W[k]=Math.round(W[k]));
+  const adjustable = (lockedKey ? keys.filter(k=>k!==lockedKey) : keys.slice()).sort((a,b)=>W[b]-W[a]);
+  let drift = target - keys.reduce((s,k)=>s+W[k],0);
+  let i=0;
+  while(drift !== 0 && adjustable.length && i < adjustable.length*4){
+    const k = adjustable[i % adjustable.length];
+    if(drift > 0 && W[k] < 100){ W[k]++; drift--; }
+    else if(drift < 0 && W[k] > 0){ W[k]--; drift++; }
+    i++;
+  }
+}
+
+function normalizeFrom(key, val){
+  val = Math.round(Math.max(0, Math.min(100, val)));
+  const keys = enabledKeys();
+  const others = keys.filter(k=>k!==key);
+  W[key] = val;
+  if(others.length===0){ W[key]=100; return; }
   const remain = 100 - val;
-  const otherSum = W[others[0]] + W[others[1]];
-  let a, b;
-  if(otherSum <= 0){ a = remain/2; b = remain/2; }
-  else { a = remain * (W[others[0]]/otherSum); b = remain * (W[others[1]]/otherSum); }
-  W[idx] = val; W[others[0]] = a; W[others[1]] = b;
-  W = W.map(v=>Math.round(v));
-  // fix rounding drift so it always sums to exactly 100
-  const drift = 100 - (W[0]+W[1]+W[2]);
-  W[others[1]] += drift;
+  const dist = distribute(others, remain);
+  others.forEach(k=>W[k]=dist[k]);
+  fixRoundingDrift(keys, 100, key);
+}
+
+// disabling/enabling a portfolio rescales the remaining enabled ones back to sum 100
+function setEnabled(key, on){
+  portfolioByKey(key).enabled = on;
+  if(!on) W[key]=0;
+  const keys = enabledKeys();
+  if(!keys.length) return;
+  const sum = keys.reduce((s,k)=>s+W[k],0);
+  if(sum<=0){ keys.forEach(k=>W[k]=100/keys.length); }
+  else { const dist=distribute(keys,100); keys.forEach(k=>W[k]=dist[k]); }
+  fixRoundingDrift(keys, 100, null);
+}
+
+function buildMixRows(){
+  const box=$("#mixRows");
+  box.innerHTML = PORTFOLIOS.map(p=>`
+    <div class="slider-row ${p.enabled?'':'disabled'}" style="--sc:var(${p.color})">
+      <div class="name">
+        <input type="checkbox" id="e-${p.key}" ${p.enabled?'checked':''}>
+        <span class="sw" style="background:var(${p.color})"></span>
+        <span class="lbl">${p.label}</span>
+      </div>
+      <input type="range" id="s-${p.key}" min="0" max="100" step="1" value="${Math.round(W[p.key])}" ${p.enabled?'':'disabled'}>
+      <div class="val mono" id="v-${p.key}">${Math.round(W[p.key])}%</div>
+    </div>`).join('');
+  $("#mixBar").innerHTML = PORTFOLIOS.map(p=>`<span id="bar-${p.key}" style="background:var(${p.color})"></span>`).join('');
+  PORTFOLIOS.forEach(p=>{
+    $("#e-"+p.key).addEventListener("change",e=>{
+      if(!e.target.checked && enabledKeys().length<=1){ e.target.checked=true; return; } // keep at least one active
+      setEnabled(p.key, e.target.checked);
+      buildMixRows(); syncSliders(); buildCurveLegend(); buildBarLegend();
+      recompute(); draw(); computeMonthRange(); barAnimId=null; drawBar();
+    });
+    $("#s-"+p.key).addEventListener("input",e=>{
+      normalizeFrom(p.key, +e.target.value);
+      syncSliders(); recompute(); draw();
+    });
+  });
 }
 
 function syncSliders(){
-  const ids=['v65','tlt','momo'];
-  ids.forEach((id,i)=>{
-    $("#s-"+id).value = W[i];
-    $("#v-"+id).textContent = W[i]+"%";
+  PORTFOLIOS.forEach(p=>{
+    const s=$("#s-"+p.key), v=$("#v-"+p.key), b=$("#bar-"+p.key);
+    if(s) s.value = W[p.key];
+    if(v) v.textContent = Math.round(W[p.key])+"%";
+    if(b) b.style.width = W[p.key]+"%";
   });
-  $("#bar-v65").style.width=W[0]+"%";
-  $("#bar-tlt").style.width=W[1]+"%";
-  $("#bar-momo").style.width=W[2]+"%";
+}
+
+function buildCurveLegend(){
+  let html = `<div class="legend-item combined"><span class="ln" style="border-color:var(--accent)"></span>Combined (weighted mix)</div>`;
+  enabledPortfolios().forEach(p=>{
+    html += `<div class="legend-item"><span class="ln" style="border-color:var(${p.color})"></span>${p.label}</div>`;
+  });
+  $("#curveLegend").innerHTML = html;
+}
+function buildBarLegend(){
+  $("#barLegend").innerHTML = enabledPortfolios().map(p=>
+    `<div class="legend-item"><span class="sw" style="background:var(${p.color})"></span>${p.label}</div>`).join('');
 }
 
 function buildCurves(){
   const n = DATA.labels.length;
-  const v65=[1], tlt=[1], momo=[1], combo=[1];
+  const out = {}; PORTFOLIOS.forEach(p=>out[p.key]=[1]); out.combo=[1];
   for(let i=1;i<n;i++){
-    const rv = DATA.v65[i] ?? 0, rt = DATA.tlt[i] ?? 0, rm = DATA.momo[i] ?? 0;
-    v65.push(v65[i-1]*(1+rv/100));
-    tlt.push(tlt[i-1]*(1+rt/100));
-    momo.push(momo[i-1]*(1+rm/100));
-    const rc = (W[0]*rv + W[1]*rt + W[2]*rm)/100;
-    combo.push(combo[i-1]*(1+rc/100));
+    let comboR=0;
+    PORTFOLIOS.forEach(p=>{
+      const r = DATA[p.key][i] ?? 0;
+      out[p.key].push(out[p.key][i-1]*(1+r/100));
+      if(p.enabled) comboR += W[p.key]*r;
+    });
+    comboR/=100;
+    out.combo.push(out.combo[i-1]*(1+comboR/100));
   }
-  return {v65,tlt,momo,combo};
+  return out;
 }
 
 let chartStartIdx = 0;
-function rebasedSlice(arr, startIdx){
+let chartEndIdx = DATA.labels.length-1;
+function lastIndexOfYear(year){
+  let idx=-1;
+  DATA.labels.forEach((l,i)=>{ if(l.startsWith(year+"-")) idx=i; });
+  return idx<0 ? DATA.labels.length-1 : idx;
+}
+function rebasedSlice(arr, startIdx, endIdx){
   const base = arr[startIdx];
-  return arr.slice(startIdx).map(v=>v/base);
+  return arr.slice(startIdx, endIdx+1).map(v=>v/base);
 }
 
 function fmtMult(v){ return v>=100? v.toFixed(0)+"×" : v>=10? v.toFixed(1)+"×" : v.toFixed(2)+"×"; }
@@ -281,7 +388,7 @@ function computeStats(series){
 
 function renderKPIs(curves){
   const s = computeStats(curves.combo);
-  const endLabel = DATA.labels[DATA.labels.length-1].slice(0,4);
+  const endLabel = DATA.labels[chartEndIdx].slice(0,4);
   const startLabel = DATA.labels[chartStartIdx].slice(0,4);
   const kpis = $("#kpis");
   kpis.innerHTML = `
@@ -314,15 +421,11 @@ const Y = e => { const a=yv(yLo),b=yv(yHi); return PADT + (H_px-PADT-PADB) - (yv
 
 function recompute(){
   const full = buildCurves();
-  curves = {
-    v65: rebasedSlice(full.v65, chartStartIdx),
-    tlt: rebasedSlice(full.tlt, chartStartIdx),
-    momo: rebasedSlice(full.momo, chartStartIdx),
-    combo: rebasedSlice(full.combo, chartStartIdx),
-  };
+  curves = {};
+  Object.keys(full).forEach(k=>{ curves[k]=rebasedSlice(full[k], chartStartIdx, chartEndIdx); });
   xMin=0; xMax=curves.combo.length-1;
   const all=[];
-  if(showIndiv){ curves.v65.forEach(v=>all.push(v)); curves.tlt.forEach(v=>all.push(v)); curves.momo.forEach(v=>all.push(v)); }
+  if(showIndiv){ enabledPortfolios().forEach(p=>curves[p.key].forEach(v=>all.push(v))); }
   curves.combo.forEach(v=>all.push(v));
   yLo=Math.max(Math.min(...all)*0.9,0.05); yHi=Math.max(...all)*1.1;
   renderKPIs(curves);
@@ -358,9 +461,9 @@ function draw(){
     ctx.fillStyle=cssv('--muted'); ctx.fillText("$"+v.toFixed(v>=10?0:1), PADL-8, y); });
 
   if(showIndiv){
-    [["v65",cssv('--v65')],["tlt",cssv('--tlt')],["momo",cssv('--momo')]].forEach(([k,col])=>{
-      ctx.strokeStyle=col; ctx.lineWidth=1.3; ctx.globalAlpha=.55;
-      ctx.stroke(pathFor(curves[k]));
+    enabledPortfolios().forEach(p=>{
+      ctx.strokeStyle=cssv(p.color); ctx.lineWidth=1.3; ctx.globalAlpha=.55;
+      ctx.stroke(pathFor(curves[p.key]));
     });
     ctx.globalAlpha=1;
   }
@@ -373,7 +476,7 @@ function draw(){
     ctx.beginPath(); ctx.moveTo(x,PADT); ctx.lineTo(x,H_px-PADB); ctx.stroke(); ctx.setLineDash([]);
     const dot=(series,col)=>{ ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,Y(series[hoverI]),3,0,7); ctx.fill();
       ctx.fillStyle=cssv('--surface'); ctx.beginPath(); ctx.arc(x,Y(series[hoverI]),1.3,0,7); ctx.fill(); };
-    if(showIndiv){ dot(curves.v65,cssv('--v65')); dot(curves.tlt,cssv('--tlt')); dot(curves.momo,cssv('--momo')); }
+    if(showIndiv){ enabledPortfolios().forEach(p=>dot(curves[p.key],cssv(p.color))); }
     dot(curves.combo,cssv('--accent'));
   }
 }
@@ -392,9 +495,9 @@ function handleChartPoint(clientX, clientY){
   tip.style.left=lx+"px"; tip.style.top=ly+"px";
   const rows=[`<div class="r hi"><span>Combined</span><b>${fmtMult(curves.combo[i])}</b></div>`];
   if(showIndiv){
-    rows.push(`<div class="r"><span>ChowMo</span><b>${fmtMult(curves.v65[i])}</b></div>`);
-    rows.push(`<div class="r"><span>TLT</span><b>${fmtMult(curves.tlt[i])}</b></div>`);
-    rows.push(`<div class="r"><span>Momo</span><b>${fmtMult(curves.momo[i])}</b></div>`);
+    enabledPortfolios().forEach(p=>{
+      rows.push(`<div class="r"><span>${p.label}</span><b>${fmtMult(curves[p.key][i])}</b></div>`);
+    });
   }
   tip.innerHTML = `<div class="t">${DATA.labels[i+chartStartIdx]}</div>` + rows.join("");
 }
@@ -406,34 +509,59 @@ $("#cwrap").addEventListener("touchmove",e=>{ const t=e.touches[0]; if(t){ handl
 $("#cwrap").addEventListener("touchend",hideChartTip);
 
 /* ---------- wiring ---------- */
-function onSlide(idx,id){
-  $("#s-"+id).addEventListener("input",e=>{
-    normalizeFrom(idx, +e.target.value);
-    syncSliders(); recompute(); draw();
-  });
-}
-onSlide(0,"v65"); onSlide(1,"tlt"); onSlide(2,"momo");
-$("#resetMix").addEventListener("click",()=>{ W=[34,33,33]; syncSliders(); recompute(); draw(); });
+$("#resetMix").addEventListener("click",()=>{
+  const keys=enabledKeys(); const each=100/Math.max(1,keys.length);
+  keys.forEach(k=>W[k]=each);
+  fixRoundingDrift(keys, 100, null);
+  syncSliders(); recompute(); draw();
+});
 $("#showIndiv").addEventListener("change",e=>{ showIndiv=e.target.checked; recompute(); draw(); });
+function updateYearFill(){
+  const sy=$("#startYear"), ey=$("#endYear");
+  const min=+sy.min, max=+sy.max;
+  const l = (+sy.value-min)/(max-min)*100;
+  const r = (+ey.value-min)/(max-min)*100;
+  const fill=$("#yearFill");
+  fill.style.left=l+"%"; fill.style.right=(100-r)+"%";
+}
 $("#startYear").addEventListener("input",e=>{
-  const year = e.target.value;
+  const sy=$("#startYear"), ey=$("#endYear");
+  if(+sy.value > +ey.value) sy.value = ey.value;
+  const year = sy.value;
   $("#startYearVal").textContent = year;
-  const idx = DATA.labels.indexOf(year+"-01");
-  chartStartIdx = idx<0 ? 0 : idx;
+  chartStartIdx = DATA.labels.indexOf(year+"-01");
+  if(chartStartIdx<0) chartStartIdx=0;
+  updateYearFill();
   hoverI=-1; recompute(); draw();
 });
+$("#endYear").addEventListener("input",e=>{
+  const sy=$("#startYear"), ey=$("#endYear");
+  if(+ey.value < +sy.value) ey.value = sy.value;
+  const year = ey.value;
+  $("#endYearVal").textContent = year;
+  chartEndIdx = lastIndexOfYear(year);
+  updateYearFill();
+  hoverI=-1; recompute(); draw();
+});
+["mousedown","touchstart"].forEach(evt=>{
+  $("#startYear").addEventListener(evt,()=>{ $("#startYear").classList.add("top"); $("#endYear").classList.remove("top"); });
+  $("#endYear").addEventListener(evt,()=>{ $("#endYear").classList.add("top"); $("#startYear").classList.remove("top"); });
+});
+updateYearFill();
 window.addEventListener("resize",()=>{ clearTimeout(window._rz); window._rz=setTimeout(resize,120); });
 const mq=window.matchMedia("(prefers-color-scheme:dark)");
 mq.addEventListener?.("change",()=>{ draw(); drawBar(); });
 new MutationObserver(()=>{ draw(); drawBar(); }).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
 
+buildMixRows();
+buildCurveLegend();
+buildBarLegend();
 syncSliders();
 recompute();
 requestAnimationFrame(resize);
 
 /* ---------- period bar chart (yearly totals / one year's monthly breakdown) ---------- */
-const SERIES_KEYS = ["v65","tlt","momo"];
-const SERIES_COLOR = {v65:'--v65', tlt:'--tlt', momo:'--momo'};
+function currentSeriesKeys(){ return enabledKeys(); }
 let periodMode = "year"; // "year" | "month"
 let years = [];
 DATA.labels.forEach(l=>{ const y=l.slice(0,4); if(!years.includes(y)) years.push(y); });
@@ -456,15 +584,16 @@ function monthlyReturn(key, year, monthIdx){
 }
 const MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function barSeriesData(forYear){
+  const keys = currentSeriesKeys();
   if(periodMode==="year"){
-    return { cats: years, rows: SERIES_KEYS.map(k=>years.map(y=>yearlyReturn(k,y))) };
+    return { cats: years, rows: keys.map(k=>years.map(y=>yearlyReturn(k,y))), keys };
   }
   const yr = forYear ?? selectedYear;
   // always all 12 month slots (missing months are null) so the category count never
   // changes between years -- that's what lets the slider interpolate bar-to-bar smoothly
   const cats = MONTH_NAMES;
-  const rows = SERIES_KEYS.map(k=>MONTH_NAMES.map((_,mi)=>monthlyReturn(k,yr,mi)));
-  return {cats, rows};
+  const rows = keys.map(k=>MONTH_NAMES.map((_,mi)=>monthlyReturn(k,yr,mi)));
+  return {cats, rows, keys};
 }
 
 // fixed y-axis range for MONTHLY mode, spanning every month of every year -- computed once so
@@ -472,7 +601,7 @@ function barSeriesData(forYear){
 let monthRange = null;
 function computeMonthRange(){
   let vMax=0, vMin=0;
-  years.forEach(y=>SERIES_KEYS.forEach(k=>{
+  years.forEach(y=>currentSeriesKeys().forEach(k=>{
     for(let mi=0;mi<12;mi++){
       const v=monthlyReturn(k,y,mi);
       if(v==null) continue;
@@ -516,10 +645,10 @@ function roundRectTopBottom(ctx,x,y,w,h,r,positive){
   }
 }
 function drawBar(){
-  const {cats, rows} = barSeriesData();
-  drawBarRaw(cats, rows, periodMode==="month" ? monthRange : null);
+  const {cats, rows, keys} = barSeriesData();
+  drawBarRaw(cats, rows, periodMode==="month" ? monthRange : null, keys);
 }
-function drawBarRaw(cats, rows, fixedRange){
+function drawBarRaw(cats, rows, fixedRange, keys){
   const cv=$("#bc"); if(!cv) return;
   const ctx=cv.getContext("2d");
   ctx.clearRect(0,0,BW,BH);
@@ -550,20 +679,21 @@ function drawBarRaw(cats, rows, fixedRange){
   ctx.beginPath(); ctx.moveTo(BPADL,y0); ctx.lineTo(BW-BPADR,y0); ctx.stroke();
 
   const groupW = plotW/n;
-  const barW = Math.min(20, groupW*0.24);
+  const nSeries = Math.max(1, rows.length);
   const gap = 3;
+  const barW = Math.max(2, Math.min(20, (groupW*0.85 - gap*(nSeries-1))/nSeries));
 
   ctx.textAlign='center'; ctx.fillStyle=cssv('--muted');
   for(let i=0;i<n;i++){
     const gx = BPADL + groupW*(i+0.5);
     ctx.fillText(cats[i], gx, BH-BPADB+12);
-    for(let s=0;s<3;s++){
+    for(let s=0;s<nSeries;s++){
       const v = rows[s][i];
       if(v==null) continue;
-      const bx = gx - (barW*3+gap*2)/2 + s*(barW+gap);
+      const bx = gx - (barW*nSeries+gap*(nSeries-1))/2 + s*(barW+gap);
       const by0=yFor(0), by1=yFor(v);
       const top=Math.min(by0,by1), h=Math.max(1,Math.abs(by1-by0));
-      ctx.fillStyle = cssv(SERIES_COLOR[SERIES_KEYS[s]]);
+      ctx.fillStyle = cssv(portfolioByKey(keys[s]).color);
       ctx.globalAlpha = (barHoverIdx===i) ? 1 : 0.85;
       roundRectTopBottom(ctx, bx, top, barW, h, 3, v>=0);
       ctx.fill();
@@ -572,7 +702,7 @@ function drawBarRaw(cats, rows, fixedRange){
   }
 }
 function handleBarPoint(clientX, clientY){
-  const {cats, rows} = barSeriesData();
+  const {cats, rows, keys} = barSeriesData();
   const n=cats.length; if(!n) return;
   const rc = $("#bc").getBoundingClientRect();
   const mx = clientX-rc.left, my = clientY-rc.top;
@@ -590,9 +720,7 @@ function handleBarPoint(clientX, clientY){
   const label = periodMode==="year" ? cats[i] : (cats[i]+" "+selectedYear);
   const fmtPct = v => v==null ? "–" : (v>=0?"+":"")+v.toFixed(2)+"%";
   tip.innerHTML = `<div class="t">${label}</div>`+
-    `<div class="r"><span>ChowMo</span><b>${fmtPct(rows[0][i])}</b></div>`+
-    `<div class="r"><span>TLT</span><b>${fmtPct(rows[1][i])}</b></div>`+
-    `<div class="r"><span>Momo</span><b>${fmtPct(rows[2][i])}</b></div>`;
+    keys.map((k,s)=>`<div class="r"><span>${portfolioByKey(k).label}</span><b>${fmtPct(rows[s][i])}</b></div>`).join("");
 }
 function hideBarTip(){ barHoverIdx=-1; $("#btip").style.opacity=0; drawBar(); }
 $("#bwrap").addEventListener("mousemove", e=>handleBarPoint(e.clientX,e.clientY));
@@ -613,7 +741,8 @@ $("#periodGrp").addEventListener("click", e=>{
 /* smoothly interpolate bar heights between the previous year and the newly selected one */
 let barAnimId=null;
 function animateToYear(newYear){
-  const from = barSeriesData(selectedYear).rows;
+  const fromData = barSeriesData(selectedYear);
+  const from = fromData.rows, keys = fromData.keys;
   selectedYear = newYear;
   const {cats, rows: to} = barSeriesData(selectedYear);
   const start = performance.now(), dur = 220;
@@ -627,8 +756,8 @@ function animateToYear(newYear){
       if(v==null && to[s][i]==null) return null;
       return a+(b-a)*ease;
     }));
-    drawBarRaw(cats, mixed, monthRange);
-    if(p<1) requestAnimationFrame(step); else drawBarRaw(cats, to, monthRange);
+    drawBarRaw(cats, mixed, monthRange, keys);
+    if(p<1) requestAnimationFrame(step); else drawBarRaw(cats, to, monthRange, keys);
   }
   requestAnimationFrame(step);
 }
