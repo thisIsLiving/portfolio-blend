@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portfolio Blend Explorer</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -148,7 +153,8 @@
     footer{font-size:11.5px;}
   }
 </style>
-
+</head>
+<body>
 <div class="page">
   <div>
     <div class="eyebrow">Clenow research &middot; monthly-return blend</div>
@@ -772,3 +778,5 @@ updateYearSliderVisibility();
 window.addEventListener("resize",()=>{ clearTimeout(window._rzb); window._rzb=setTimeout(resizeBar,120); });
 requestAnimationFrame(resizeBar);
 </script>
+</body>
+</html>
