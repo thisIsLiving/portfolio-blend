@@ -1,0 +1,645 @@
+<title>Portfolio Blend Explorer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#F4F3F0; --surface:#FFFFFF; --panel:#FAFAF8; --panel-2:#F1F0EC;
+    --ink:#1A1C22; --ink-2:#565A64; --muted:#8B8E96; --border:#E3E1DB; --border-2:#EDECE7;
+    --accent:#1F6F6B; --accent-fill:#1F6F6B1A;
+    --v65:#3E6F9E; --tlt:#C4913A; --momo:#8A6FB0;
+    --up:#3E8F5F; --down:#C0503E;
+    --shadow:0 1px 2px rgba(20,22,28,.05), 0 8px 26px -14px rgba(20,22,28,.14);
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#141519; --surface:#1C1E23; --panel:#191A1F; --panel-2:#212228;
+    --ink:#E6E5E1; --ink-2:#A8AAB0; --muted:#7C7E85; --border:#2B2D33; --border-2:#232429;
+    --accent:#4FA9A3; --accent-fill:#4FA9A322;
+    --v65:#6C9CCB; --tlt:#D9A94F; --momo:#AE93D8;
+    --up:#5CB682; --down:#D9705C;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 36px -18px rgba(0,0,0,.6);
+  }}
+  :root[data-theme="dark"]{
+    --bg:#141519; --surface:#1C1E23; --panel:#191A1F; --panel-2:#212228;
+    --ink:#E6E5E1; --ink-2:#A8AAB0; --muted:#7C7E85; --border:#2B2D33; --border-2:#232429;
+    --accent:#4FA9A3; --accent-fill:#4FA9A322;
+    --v65:#6C9CCB; --tlt:#D9A94F; --momo:#AE93D8;
+    --up:#5CB682; --down:#D9705C;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 36px -18px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+    font-size:15px;display:flex;justify-content:center;padding:28px 18px 40px;}
+  .mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;}
+  .page{width:100%;max-width:1000px;display:flex;flex-direction:column;gap:18px;}
+
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;}
+  h1{font-size:27px;font-weight:600;margin:4px 0 0;letter-spacing:-.01em;text-wrap:balance;}
+  .sub{font-size:14.5px;color:var(--ink-2);margin-top:6px;line-height:1.55;max-width:70ch;}
+  .sub code{font-family:"IBM Plex Mono",monospace;background:var(--panel-2);padding:1px 5px;border-radius:4px;font-size:13px;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+  .kpi{background:var(--surface);padding:15px 17px;display:flex;flex-direction:column;gap:5px;}
+  .kpi-label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:500;}
+  .kpi-val{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:21px;font-weight:600;letter-spacing:-.01em;}
+  .kpi-sub{font-size:12px;color:var(--muted);}
+
+  .mix-card{padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
+  .mix-head{display:flex;align-items:baseline;justify-content:space-between;}
+  .mix-head b{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;}
+  .mix-head a{font-size:12.5px;color:var(--accent);cursor:pointer;font-family:"IBM Plex Mono",monospace;}
+  .slider-row{display:grid;grid-template-columns:110px 1fr 56px;align-items:center;gap:12px;}
+  .slider-row .name{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500;}
+  .slider-row .sw{width:10px;height:10px;border-radius:3px;flex:none;}
+  .slider-row input[type=range]{width:100%;accent-color:var(--sc,var(--accent));height:18px;}
+  .slider-row .val{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600;text-align:right;}
+  .mixbar{height:8px;border-radius:5px;overflow:hidden;display:flex;border:1px solid var(--border-2);}
+  .mixbar span{height:100%;transition:width .12s;}
+
+  .chart-card{padding:18px 18px 10px;}
+  .chart-title{font-size:16.5px;font-weight:600;margin:0 0 10px;letter-spacing:-.005em;}
+  .chart-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:8px;}
+  .legend{display:flex;gap:15px;align-items:center;flex-wrap:wrap;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2);font-weight:500;}
+  .legend-item .ln{width:15px;height:0;border-top:2px solid;flex:none;}
+  .legend-item.combined .ln{border-top-width:3px;}
+  .toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2);cursor:pointer;}
+  .toggle input{accent-color:var(--accent);}
+
+  .chart-wrap{position:relative;height:400px;}
+  canvas{display:block;width:100%;height:100%;}
+  #tip,#btip{position:absolute;pointer-events:none;opacity:0;transition:opacity .08s;background:var(--surface);
+    border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:9px 11px;font-size:12.5px;
+    font-family:"IBM Plex Mono",monospace;z-index:10;min-width:185px;}
+  #tip .t,#btip .t{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:13.5px;color:var(--ink);margin-bottom:5px;}
+  #tip .r,#btip .r{display:grid;grid-template-columns:1fr auto;gap:12px;color:var(--ink-2);padding:1.5px 0;}
+  #tip .r b,#btip .r b{color:var(--ink);text-align:right;}
+  #tip .r.hi b{color:var(--accent);}
+
+  .btn{font:inherit;font-size:13px;font-weight:500;padding:5px 10px;border-radius:7px;
+    border:1px solid var(--border);background:var(--panel);color:var(--ink);cursor:pointer;}
+  .resgrp{display:flex;gap:2px;border:1px solid var(--border);border-radius:7px;padding:2px;background:var(--panel);}
+  .resgrp button{font:inherit;font-size:12.5px;font-weight:500;padding:4px 10px;border-radius:5px;
+    border:none;background:transparent;color:var(--ink-2);cursor:pointer;}
+  .resgrp button.on{background:var(--accent);color:#fff;}
+
+  .range-row{display:flex;align-items:center;gap:12px;padding:10px 2px 2px;border-top:1px solid var(--border-2);margin-top:8px;}
+  .range-row .rlabel{font-size:12.5px;color:var(--ink-2);font-weight:500;flex:none;}
+  .range-row input[type=range]{flex:1;accent-color:var(--accent);height:18px;}
+  .range-row .rval{font-family:"IBM Plex Mono",monospace;font-size:13.5px;font-weight:600;flex:none;min-width:38px;text-align:right;}
+
+  footer{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);
+    display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0 2px;}
+
+  @media (max-width:640px){
+    body{padding:16px 10px 28px;font-size:16px;}
+    .page{gap:16px;}
+    h1{font-size:24px;}
+    .sub{font-size:14.5px;}
+    .kpis{grid-template-columns:1fr 1fr;}
+    .kpi{padding:14px 14px;gap:6px;}
+    .kpi-label{font-size:12px;}
+    .kpi-val{font-size:22px;}
+    .kpi-sub{font-size:12px;}
+    .mix-card{padding:16px 14px;gap:14px;}
+    .mix-head b{font-size:13.5px;}
+    .chart-card{padding:16px 14px 10px;}
+    .chart-title{font-size:17px;}
+    .slider-row{grid-template-columns:78px 1fr 48px;gap:8px;}
+    .slider-row .name{font-size:14px;gap:6px;}
+    .slider-row .val{font-size:15px;}
+    .slider-row input[type=range]{height:26px;}
+    .range-row{gap:10px;}
+    .range-row .rlabel{font-size:13px;}
+    .range-row input[type=range]{height:26px;}
+    .range-row .rval{font-size:14.5px;}
+    .chart-wrap{height:340px;}
+    #bwrap{height:300px !important;}
+    .legend{gap:12px;}
+    .legend-item{font-size:13.5px;}
+    .toggle{font-size:13.5px;}
+    .btn,.resgrp button{font-size:13.5px;padding:6px 11px;}
+    #tip,#btip{font-size:13.5px;min-width:170px;}
+    #tip .t,#btip .t{font-size:14.5px;}
+    footer{font-size:11.5px;}
+  }
+</style>
+
+<div class="page">
+  <div>
+    <div class="eyebrow">Clenow research &middot; monthly-return blend</div>
+    <h1>Portfolio blend explorer</h1>
+    <p class="sub">Blend <b style="color:var(--v65)">ChowMo</b>, <b style="color:var(--tlt)">TLT</b> and <b style="color:var(--momo)">Momo</b> by allocation weight &mdash; each month's blended return is the weighted average of the three portfolios' own monthly returns, compounded from <code>$1.00</code> starting January 2007. Drag a slider; the other two rebalance to keep the mix at 100%.</p>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card mix-card">
+    <div class="mix-head"><b>Allocation mix</b><a id="resetMix">reset to equal thirds</a></div>
+    <div class="slider-row" style="--sc:var(--v65)">
+      <div class="name"><span class="sw" style="background:var(--v65)"></span>ChowMo</div>
+      <input type="range" id="s-v65" min="0" max="100" step="1" value="34">
+      <div class="val mono" id="v-v65">34%</div>
+    </div>
+    <div class="slider-row" style="--sc:var(--tlt)">
+      <div class="name"><span class="sw" style="background:var(--tlt)"></span>TLT</div>
+      <input type="range" id="s-tlt" min="0" max="100" step="1" value="33">
+      <div class="val mono" id="v-tlt">33%</div>
+    </div>
+    <div class="slider-row" style="--sc:var(--momo)">
+      <div class="name"><span class="sw" style="background:var(--momo)"></span>Momo</div>
+      <input type="range" id="s-momo" min="0" max="100" step="1" value="33">
+      <div class="val mono" id="v-momo">33%</div>
+    </div>
+    <div class="mixbar">
+      <span id="bar-v65" style="background:var(--v65)"></span>
+      <span id="bar-tlt" style="background:var(--tlt)"></span>
+      <span id="bar-momo" style="background:var(--momo)"></span>
+    </div>
+  </div>
+
+  <div class="card chart-card">
+    <div class="chart-title">Equity Curves</div>
+    <div class="chart-head">
+      <div class="legend">
+        <div class="legend-item combined"><span class="ln" style="border-color:var(--accent)"></span>Combined (weighted mix)</div>
+        <div class="legend-item"><span class="ln" style="border-color:var(--v65)"></span>ChowMo</div>
+        <div class="legend-item"><span class="ln" style="border-color:var(--tlt)"></span>TLT</div>
+        <div class="legend-item"><span class="ln" style="border-color:var(--momo)"></span>Momo</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="showIndiv" checked>Show individual portfolios</label>
+    </div>
+    <div class="chart-wrap" id="cwrap">
+      <canvas id="cv" role="img" aria-label="Log-scale equity curve chart comparing three portfolios (ChowMo, TLT, Momo) and their weighted-allocation combined blend, monthly from January 2007 to September 2026."></canvas>
+      <div id="tip"></div>
+    </div>
+    <div class="range-row">
+      <span class="rlabel">Start year</span>
+      <input type="range" id="startYear" min="2007" max="2026" step="1" value="2007">
+      <span class="rval mono" id="startYearVal">2007</span>
+    </div>
+  </div>
+
+  <div class="card chart-card">
+    <div class="chart-title">Portfolio Returns</div>
+    <div class="chart-head">
+      <div class="legend">
+        <div class="legend-item"><span class="sw" style="background:var(--v65)"></span>ChowMo</div>
+        <div class="legend-item"><span class="sw" style="background:var(--tlt)"></span>TLT</div>
+        <div class="legend-item"><span class="sw" style="background:var(--momo)"></span>Momo</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="resgrp" id="periodGrp">
+          <button data-p="year" class="on">Yearly</button>
+          <button data-p="month">Monthly</button>
+        </span>
+      </div>
+    </div>
+    <div class="chart-wrap" id="bwrap" style="height:320px;">
+      <canvas id="bc" role="img" aria-label="Bar chart comparing period returns of ChowMo, TLT and Momo, toggleable between yearly totals and a single year's monthly breakdown."></canvas>
+      <div id="btip"></div>
+    </div>
+    <div class="range-row" id="bYearRow" hidden>
+      <span class="rlabel">Year</span>
+      <input type="range" id="barYear" min="2007" max="2026" step="1" value="2026">
+      <span class="rval mono" id="barYearVal">2026</span>
+    </div>
+  </div>
+
+  <footer>
+    <span>237 months &middot; Jan 2007 &rarr; Sep 2026</span>
+    <span>ChowMo: RealTest equity export (test 24) &middot; TLT / Momo: pasted monthly return tables, compounded</span>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const chartFontPx = () => window.innerWidth<=640 ? 13 : 11;
+const cssv = n => getComputedStyle(document.body).getPropertyValue(n).trim();
+const DATA = {"labels": ["2007-01", "2007-02", "2007-03", "2007-04", "2007-05", "2007-06", "2007-07", "2007-08", "2007-09", "2007-10", "2007-11", "2007-12", "2008-01", "2008-02", "2008-03", "2008-04", "2008-05", "2008-06", "2008-07", "2008-08", "2008-09", "2008-10", "2008-11", "2008-12", "2009-01", "2009-02", "2009-03", "2009-04", "2009-05", "2009-06", "2009-07", "2009-08", "2009-09", "2009-10", "2009-11", "2009-12", "2010-01", "2010-02", "2010-03", "2010-04", "2010-05", "2010-06", "2010-07", "2010-08", "2010-09", "2010-10", "2010-11", "2010-12", "2011-01", "2011-02", "2011-03", "2011-04", "2011-05", "2011-06", "2011-07", "2011-08", "2011-09", "2011-10", "2011-11", "2011-12", "2012-01", "2012-02", "2012-03", "2012-04", "2012-05", "2012-06", "2012-07", "2012-08", "2012-09", "2012-10", "2012-11", "2012-12", "2013-01", "2013-02", "2013-03", "2013-04", "2013-05", "2013-06", "2013-07", "2013-08", "2013-09", "2013-10", "2013-11", "2013-12", "2014-01", "2014-02", "2014-03", "2014-04", "2014-05", "2014-06", "2014-07", "2014-08", "2014-09", "2014-10", "2014-11", "2014-12", "2015-01", "2015-02", "2015-03", "2015-04", "2015-05", "2015-06", "2015-07", "2015-08", "2015-09", "2015-10", "2015-11", "2015-12", "2016-01", "2016-02", "2016-03", "2016-04", "2016-05", "2016-06", "2016-07", "2016-08", "2016-09", "2016-10", "2016-11", "2016-12", "2017-01", "2017-02", "2017-03", "2017-04", "2017-05", "2017-06", "2017-07", "2017-08", "2017-09", "2017-10", "2017-11", "2017-12", "2018-01", "2018-02", "2018-03", "2018-04", "2018-05", "2018-06", "2018-07", "2018-08", "2018-09", "2018-10", "2018-11", "2018-12", "2019-01", "2019-02", "2019-03", "2019-04", "2019-05", "2019-06", "2019-07", "2019-08", "2019-09", "2019-10", "2019-11", "2019-12", "2020-01", "2020-02", "2020-03", "2020-04", "2020-05", "2020-06", "2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12", "2021-01", "2021-02", "2021-03", "2021-04", "2021-05", "2021-06", "2021-07", "2021-08", "2021-09", "2021-10", "2021-11", "2021-12", "2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09"], "v65": [null, -1.9417, -0.9901, 8.0, 8.3333, 4.2735, -1.6393, 1.6667, 13.1148, -2.1739, -12.5926, 7.6271, 11.0236, 4.9645, -6.0811, -0.7194, 8.6957, 15.3333, -1.7341, -8.8235, 3.871, -15.528, 11.7647, 7.8947, 5.4878, 1.1561, -2.2857, 8.1871, 9.7297, 5.4187, 9.3458, 18.8034, 6.8345, -15.8249, 4.8, 3.4351, -5.5351, 5.4688, 2.2222, 1.4493, -1.7857, 2.1818, -4.6263, 5.2239, 0.7092, 10.5634, 1.9108, -1.25, 9.1772, 1.1594, 4.0115, -3.0303, -2.2727, -7.2674, -2.5078, 15.4341, -10.8635, 5.9375, 1.4749, -4.0698, 6.9697, 4.8159, 9.7297, -1.7241, -10.5263, 2.521, 1.0929, -3.5135, 5.042, 1.8667, 3.9267, 5.0378, 20.6235, 1.9881, 10.1365, 8.8496, 4.2276, 9.3604, 8.5592, 1.8397, 10.8387, -9.1967, 0.1282, 4.0973, -8.7331, 11.4555, -5.925, -6.8123, -2.7586, 6.383, -5.4667, 4.3724, -4.4595, -10.6082, 3.0063, -4.3011, 0.0, 3.0498, 7.1651, -0.5814, 1.462, 0.7205, -6.7239, 0.4601, -1.8321, 4.1991, -1.9403, -0.6088, -5.2067, 10.8239, 2.4781, 11.522, -11.8622, -1.7366, 0.8837, 7.2993, 0.0, 0.4082, 4.2005, 5.5917, 0.6158, -3.1824, -0.5057, -0.8895, 3.5897, 1.1139, 5.3856, -0.1161, 2.5581, 3.4014, 8.2237, -0.7092, -0.5102, -3.2821, -6.8929, -0.9112, 8.3908, 4.3478, -2.7439, 22.466, 7.2526, -13.2856, 0.367, 4.936, 2.9617, 2.7919, 2.0576, 2.0161, -7.3518, 1.1092, 3.3755, 5.7959, -8.4105, 1.7692, 4.9669, 2.2082, 13.4259, -0.2041, 1.7723, 7.0998, 2.5641, 3.4146, 38.4434, 4.5571, 5.5804, 6.0957, 9.2727, 2.629, 0.4864, 7.3572, -13.8864, -1.2216, 7.3852, -7.667, 13.9701, 3.8149, 1.0843, 6.4064, -8.485, -5.4468, -16.4078, 6.1556, 1.2764, -2.0886, -3.2733, -1.5589, -2.5879, -2.3791, -1.6653, -1.7761, 12.6156, 0.0747, 2.3507, -4.8852, -1.4565, 2.0226, 18.0328, 5.9432, 13.5976, -1.3151, -15.3658, 7.3586, -0.0898, 6.2612, -11.4745, 6.8471, 7.3323, -1.9161, 16.3647, -11.1192, -6.3236, 2.1625, 8.2094, 8.5646, 29.8028, 3.5453, 3.4783, -1.5756, 12.5044, 5.2648, 0.8111, 10.7122, 9.6219, -4.3825, 11.6831, 20.738, 11.6919, 8.0471, 33.1992, 29.0647, -21.8265, 3.7513, 13.7102, 8.5689, -23.3385, 0.6278, -1.6458], "tlt": [0.0, 2.7, -0.5, 5.1, 0.5, 6.2, 0.5, 0.0, 12.3, 12.7, -2.7, -1.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -2.4, 9.7, 1.7, 15.7, -8.5, 7.2, 4.9, -6.9, 14.6, 7.7, 7.0, -7.5, -0.9, 0.0, 0.0, 0.0, 4.6, -0.2, 1.8, 3.3, 2.0, 2.7, 2.4, -0.6, 2.5, 5.1, 2.5, 0.0, 0.0, 0.0, 0.0, 4.0, 7.0, 6.8, 0.1, -0.7, 2.2, 1.2, 1.5, 2.8, -8.7, 4.8, 0.5, 5.5, 8.2, 8.2, 0.5, 9.1, 3.5, 5.8, 7.7, 11.7, -5.4, 3.6, 3.6, 10.8, 11.3, -8.6, 2.0, 9.2, 7.8, -6.9, 7.2, 0.0, 2.8, 2.1, -1.2, 3.0, 10.6, 0.2, -3.7, 8.5, -2.8, 1.3, -5.1, -2.7, 0.0, 7.5, 0.4, -2.7, 0.0, 0.0, -2.4, 9.9, 1.3, 10.5, 4.0, 8.1, 0.8, 10.5, 0.6, 11.5, -0.9, 6.8, 3.3, 10.7, 0.0, -1.0, 3.6, 2.2, 9.5, -0.66, -6.36, 12.6, 2.3, 5.59, -8.83, 6.85, 2.87, 1.31, 8.76, 1.09, -20.14, 0.34, 0.0, 0.0, 0.0, 4.67, 3.92, -3.01, 1.03, -1.85, 0.07, -4.3, 3.6, 0.09, 6.81, -4.56, -0.86, 2.98, 0.0, 0.0, 18.06, 11.62, 29.88, -0.49, -5.76, 16.92, 7.97, 4.69, -7.67, -12.39, 11.51, -0.41, 8.45, 15.98, 6.57, -3.31, 5.59, -3.02, -8.79, -20.69, 5.82, -0.29, -5.24, -0.1, 0.0, 0.0, -4.53, -2.52, 0.0, 2.56, -4.41, 1.26, -7.63, -1.12, -4.82, 6.59, 9.7, 3.47, -5.68, -2.71, 0.0, 3.27, 6.89, 3.68, 11.71, -0.64, -3.72, 14.91, 3.26, -3.71, 0.76, 1.79, 2.89, 10.03, -0.29, -2.61, -4.42, -12.05, 5.5, 6.51, 3.91, -6.67, 3.44, 16.2, 1.43, -9.9, 4.28, 16.0, 0.22, -3.51, 31.17, 30.71, 22.35, -25.96, -1.91, -0.94], "momo": [0.5, -0.4, 2.2, 3.9, 7.5, -0.1, -3.3, -0.7, 5.6, 7.7, -11.0, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0, 7.7, 2.2, 8.9, -6.0, 3.9, 4.8, -1.9, 7.2, 7.6, 3.5, -6.4, -0.9, 0.0, 0.0, 0.0, 6.1, 5.3, 1.2, 2.7, 5.3, 1.1, 4.4, 4.0, -1.5, -4.7, 1.5, 0.0, 0.0, 0.0, 0.0, 0.5, 4.6, 4.0, 4.5, 1.5, 1.1, 1.5, 2.9, 4.3, -1.7, 3.7, -1.2, 7.8, 5.0, 7.7, 2.2, 2.0, 0.7, 6.5, -2.8, 9.0, 5.5, 2.8, 2.1, -1.7, 5.7, 0.1, 1.6, 4.8, 5.2, -2.6, 6.9, -0.5, -0.3, 9.7, 1.2, 3.6, 3.4, 3.2, -6.5, 4.8, 0.3, 1.4, -8.4, -2.1, 0.0, 0.1, -0.2, -2.13, 0.0, 0.0, -2.03, 1.85, 5.42, 3.76, -5.24, 3.24, -4.88, 10.12, 3.59, 0.68, 2.37, 0.76, -0.95, 0.02, -1.35, -0.32, -0.2, 3.35, 4.69, 4.48, 0.3, 3.07, -5.63, -1.24, -0.54, 0.0, 1.35, -0.72, 5.85, -0.37, -16.2, 0.43, 0.0, 0.0, 0.0, 2.02, 0.91, -3.86, 0.47, 1.09, 0.89, -0.08, -0.15, 1.3, 0.0, -0.77, -6.26, 0.53, 0.0, 0.0, 3.14, 13.1, 4.28, 4.58, -0.63, 23.68, 5.39, 2.52, 11.9, 2.78, 6.6, 4.86, -3.08, -4.12, -0.07, -1.99, 6.35, 0.58, 7.54, -1.73, 4.31, 1.74, -3.91, -0.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -7.87, -0.72, 1.53, 6.22, -9.17, -1.06, 0.02, 7.39, -4.26, -9.89, 0.14, 0.0, 11.13, 4.06, 14.66, 6.27, -3.75, 7.46, -1.41, -4.7, 10.1, 5.94, 4.0, 31.3, -9.52, 1.02, -3.23, 0.47, 0.1, 0.0, 13.2, 6.6, 0.0, 3.9, 1.7, -4.0, -1.3, 3.4, 6.6, -6.7, 1.2, 9.6, 14.7, -8.8, -2.8, null]};
+
+let W=[34,33,33]; // v65, tlt, momo
+
+function normalizeFrom(idx, val){
+  val = Math.max(0, Math.min(100, val));
+  const others = [0,1,2].filter(i=>i!==idx);
+  const remain = 100 - val;
+  const otherSum = W[others[0]] + W[others[1]];
+  let a, b;
+  if(otherSum <= 0){ a = remain/2; b = remain/2; }
+  else { a = remain * (W[others[0]]/otherSum); b = remain * (W[others[1]]/otherSum); }
+  W[idx] = val; W[others[0]] = a; W[others[1]] = b;
+  W = W.map(v=>Math.round(v));
+  // fix rounding drift so it always sums to exactly 100
+  const drift = 100 - (W[0]+W[1]+W[2]);
+  W[others[1]] += drift;
+}
+
+function syncSliders(){
+  const ids=['v65','tlt','momo'];
+  ids.forEach((id,i)=>{
+    $("#s-"+id).value = W[i];
+    $("#v-"+id).textContent = W[i]+"%";
+  });
+  $("#bar-v65").style.width=W[0]+"%";
+  $("#bar-tlt").style.width=W[1]+"%";
+  $("#bar-momo").style.width=W[2]+"%";
+}
+
+function buildCurves(){
+  const n = DATA.labels.length;
+  const v65=[1], tlt=[1], momo=[1], combo=[1];
+  for(let i=1;i<n;i++){
+    const rv = DATA.v65[i] ?? 0, rt = DATA.tlt[i] ?? 0, rm = DATA.momo[i] ?? 0;
+    v65.push(v65[i-1]*(1+rv/100));
+    tlt.push(tlt[i-1]*(1+rt/100));
+    momo.push(momo[i-1]*(1+rm/100));
+    const rc = (W[0]*rv + W[1]*rt + W[2]*rm)/100;
+    combo.push(combo[i-1]*(1+rc/100));
+  }
+  return {v65,tlt,momo,combo};
+}
+
+let chartStartIdx = 0;
+function rebasedSlice(arr, startIdx){
+  const base = arr[startIdx];
+  return arr.slice(startIdx).map(v=>v/base);
+}
+
+function fmtMult(v){ return v>=100? v.toFixed(0)+"×" : v>=10? v.toFixed(1)+"×" : v.toFixed(2)+"×"; }
+
+function computeStats(series){
+  const n=series.length;
+  const years = (n-1)/12;
+  const cagr = (Math.pow(series[n-1]/series[0], 1/years)-1)*100;
+  let peak=series[0], maxdd=0;
+  for(const v of series){ if(v>peak) peak=v; const dd=(v/peak-1)*100; if(dd<maxdd) maxdd=dd; }
+  const mar = maxdd<0 ? cagr/Math.abs(maxdd) : null;
+  return {final:series[n-1], cagr, maxdd, mar};
+}
+
+function renderKPIs(curves){
+  const s = computeStats(curves.combo);
+  const endLabel = DATA.labels[DATA.labels.length-1].slice(0,4);
+  const startLabel = DATA.labels[chartStartIdx].slice(0,4);
+  const kpis = $("#kpis");
+  kpis.innerHTML = `
+    <div class="kpi"><div class="kpi-label">Final multiple</div>
+      <div class="kpi-val mono">${fmtMult(s.final)}</div><div class="kpi-sub">$1 &rarr; $${s.final.toFixed(2)}</div></div>
+    <div class="kpi"><div class="kpi-label">CAGR</div>
+      <div class="kpi-val mono">${s.cagr.toFixed(1)}%</div><div class="kpi-sub">annualized, ${startLabel}&ndash;${endLabel}</div></div>
+    <div class="kpi"><div class="kpi-label">Max drawdown</div>
+      <div class="kpi-val mono">${s.maxdd.toFixed(1)}%</div><div class="kpi-sub">peak to trough, blended curve</div></div>
+    <div class="kpi"><div class="kpi-label">MAR</div>
+      <div class="kpi-val mono">${s.mar!=null?s.mar.toFixed(2):"–"}</div><div class="kpi-sub">CAGR / |MaxDD|</div></div>`;
+}
+
+/* ---------- chart ---------- */
+let W_px=0,H_px=0,PADL=54,PADR=14,PADT=14,PADB=28,dpr=1;
+let xMin=0,xMax=1,yLo=1,yHi=1;
+let curves=null, showIndiv=true, hoverI=-1;
+
+function resize(){
+  const wrap=$("#cwrap"); dpr=Math.min(window.devicePixelRatio||1,2);
+  W_px=wrap.clientWidth; H_px=wrap.clientHeight;
+  if(H_px<40||W_px<40){ requestAnimationFrame(resize); return; }
+  const cv=$("#cv"); cv.width=W_px*dpr; cv.height=H_px*dpr;
+  const ctx=cv.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
+  draw();
+}
+const X = i => PADL + (i-xMin)/((xMax-xMin)||1)*(W_px-PADL-PADR);
+const yv = e => Math.log(Math.max(e,1e-6));
+const Y = e => { const a=yv(yLo),b=yv(yHi); return PADT + (H_px-PADT-PADB) - (yv(e)-a)/((b-a)||1)*(H_px-PADT-PADB); };
+
+function recompute(){
+  const full = buildCurves();
+  curves = {
+    v65: rebasedSlice(full.v65, chartStartIdx),
+    tlt: rebasedSlice(full.tlt, chartStartIdx),
+    momo: rebasedSlice(full.momo, chartStartIdx),
+    combo: rebasedSlice(full.combo, chartStartIdx),
+  };
+  xMin=0; xMax=curves.combo.length-1;
+  const all=[];
+  if(showIndiv){ curves.v65.forEach(v=>all.push(v)); curves.tlt.forEach(v=>all.push(v)); curves.momo.forEach(v=>all.push(v)); }
+  curves.combo.forEach(v=>all.push(v));
+  yLo=Math.max(Math.min(...all)*0.9,0.05); yHi=Math.max(...all)*1.1;
+  renderKPIs(curves);
+}
+
+function niceLog(lo,hi){ const out=[]; for(let e=Math.floor(Math.log10(lo));e<=Math.ceil(Math.log10(hi));e++){
+  [1,2,5].forEach(m=>{ const v=m*10**e; if(v>=lo*0.8&&v<=hi*1.2) out.push(v); }); } return out; }
+
+function pathFor(series){
+  const p=new Path2D();
+  series.forEach((v,i)=>{ const x=X(i),y=Y(v); i?p.lineTo(x,y):p.moveTo(x,y); });
+  return p;
+}
+
+function draw(){
+  const cv=$("#cv"); if(!cv||!curves) return;
+  const ctx=cv.getContext("2d");
+  ctx.clearRect(0,0,W_px,H_px);
+
+  ctx.strokeStyle=cssv('--border-2'); ctx.fillStyle=cssv('--muted'); ctx.lineWidth=1;
+  ctx.font=chartFontPx()+'px "IBM Plex Mono", monospace'; ctx.textBaseline='middle';
+  for(let i=0;i<curves.combo.length;i++){
+    const lbl=DATA.labels[i+chartStartIdx];
+    if(!lbl.endsWith("-01")) continue;
+    const x=X(i);
+    ctx.beginPath();ctx.moveTo(x,PADT);ctx.lineTo(x,H_px-PADB);ctx.stroke();
+    ctx.textAlign='center'; ctx.fillText("'"+lbl.slice(2,4), x, H_px-PADB+11);
+  }
+  const yticks=niceLog(yLo,yHi);
+  ctx.textAlign='right';
+  yticks.forEach(v=>{ const y=Y(v); if(y<PADT||y>H_px-PADB) return;
+    ctx.strokeStyle=cssv('--border-2'); ctx.beginPath();ctx.moveTo(PADL,y);ctx.lineTo(W_px-PADR,y);ctx.stroke();
+    ctx.fillStyle=cssv('--muted'); ctx.fillText("$"+v.toFixed(v>=10?0:1), PADL-8, y); });
+
+  if(showIndiv){
+    [["v65",cssv('--v65')],["tlt",cssv('--tlt')],["momo",cssv('--momo')]].forEach(([k,col])=>{
+      ctx.strokeStyle=col; ctx.lineWidth=1.3; ctx.globalAlpha=.55;
+      ctx.stroke(pathFor(curves[k]));
+    });
+    ctx.globalAlpha=1;
+  }
+  ctx.strokeStyle=cssv('--accent'); ctx.lineWidth=2.6; ctx.lineJoin="round"; ctx.lineCap="round";
+  ctx.stroke(pathFor(curves.combo));
+
+  if(hoverI>=0){
+    const x=X(hoverI);
+    ctx.strokeStyle=cssv('--border'); ctx.setLineDash([3,3]); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x,PADT); ctx.lineTo(x,H_px-PADB); ctx.stroke(); ctx.setLineDash([]);
+    const dot=(series,col)=>{ ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,Y(series[hoverI]),3,0,7); ctx.fill();
+      ctx.fillStyle=cssv('--surface'); ctx.beginPath(); ctx.arc(x,Y(series[hoverI]),1.3,0,7); ctx.fill(); };
+    if(showIndiv){ dot(curves.v65,cssv('--v65')); dot(curves.tlt,cssv('--tlt')); dot(curves.momo,cssv('--momo')); }
+    dot(curves.combo,cssv('--accent'));
+  }
+}
+
+function handleChartPoint(clientX, clientY){
+  const rc=$("#cv").getBoundingClientRect();
+  const mx=clientX-rc.left;
+  let i=Math.round((mx-PADL)/((W_px-PADL-PADR)||1)*(xMax-xMin)+xMin);
+  i=Math.max(0,Math.min(curves.combo.length-1,i));
+  if(i!==hoverI){ hoverI=i; draw(); }
+  const tip=$("#tip");
+  tip.style.opacity=1;
+  const th=tip.offsetHeight||140, tw=tip.offsetWidth||200;
+  let lx=(clientX-rc.left)-tw/2; lx=Math.max(6,Math.min(lx,W_px-tw-6));
+  let ly=(clientY-rc.top)-th-16; if(ly<6) ly=(clientY-rc.top)+16;
+  tip.style.left=lx+"px"; tip.style.top=ly+"px";
+  const rows=[`<div class="r hi"><span>Combined</span><b>${fmtMult(curves.combo[i])}</b></div>`];
+  if(showIndiv){
+    rows.push(`<div class="r"><span>ChowMo</span><b>${fmtMult(curves.v65[i])}</b></div>`);
+    rows.push(`<div class="r"><span>TLT</span><b>${fmtMult(curves.tlt[i])}</b></div>`);
+    rows.push(`<div class="r"><span>Momo</span><b>${fmtMult(curves.momo[i])}</b></div>`);
+  }
+  tip.innerHTML = `<div class="t">${DATA.labels[i+chartStartIdx]}</div>` + rows.join("");
+}
+function hideChartTip(){ hoverI=-1; $("#tip").style.opacity=0; draw(); }
+$("#cwrap").addEventListener("mousemove",e=>handleChartPoint(e.clientX,e.clientY));
+$("#cwrap").addEventListener("mouseleave",hideChartTip);
+$("#cwrap").addEventListener("touchstart",e=>{ const t=e.touches[0]; if(t) handleChartPoint(t.clientX,t.clientY); },{passive:true});
+$("#cwrap").addEventListener("touchmove",e=>{ const t=e.touches[0]; if(t){ handleChartPoint(t.clientX,t.clientY); e.preventDefault(); } },{passive:false});
+$("#cwrap").addEventListener("touchend",hideChartTip);
+
+/* ---------- wiring ---------- */
+function onSlide(idx,id){
+  $("#s-"+id).addEventListener("input",e=>{
+    normalizeFrom(idx, +e.target.value);
+    syncSliders(); recompute(); draw();
+  });
+}
+onSlide(0,"v65"); onSlide(1,"tlt"); onSlide(2,"momo");
+$("#resetMix").addEventListener("click",()=>{ W=[34,33,33]; syncSliders(); recompute(); draw(); });
+$("#showIndiv").addEventListener("change",e=>{ showIndiv=e.target.checked; recompute(); draw(); });
+$("#startYear").addEventListener("input",e=>{
+  const year = e.target.value;
+  $("#startYearVal").textContent = year;
+  const idx = DATA.labels.indexOf(year+"-01");
+  chartStartIdx = idx<0 ? 0 : idx;
+  hoverI=-1; recompute(); draw();
+});
+window.addEventListener("resize",()=>{ clearTimeout(window._rz); window._rz=setTimeout(resize,120); });
+const mq=window.matchMedia("(prefers-color-scheme:dark)");
+mq.addEventListener?.("change",()=>{ draw(); drawBar(); });
+new MutationObserver(()=>{ draw(); drawBar(); }).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+syncSliders();
+recompute();
+requestAnimationFrame(resize);
+
+/* ---------- period bar chart (yearly totals / one year's monthly breakdown) ---------- */
+const SERIES_KEYS = ["v65","tlt","momo"];
+const SERIES_COLOR = {v65:'--v65', tlt:'--tlt', momo:'--momo'};
+let periodMode = "year"; // "year" | "month"
+let years = [];
+DATA.labels.forEach(l=>{ const y=l.slice(0,4); if(!years.includes(y)) years.push(y); });
+let selectedYear = years[years.length-1];
+
+function yearlyReturn(key, year){
+  let eq=1, any=false;
+  DATA.labels.forEach((l,i)=>{
+    if(!l.startsWith(year+"-")) return;
+    const r = DATA[key][i];
+    if(r==null) return;
+    eq *= (1+r/100); any=true;
+  });
+  return any ? (eq-1)*100 : null;
+}
+function monthlyReturn(key, year, monthIdx){
+  const label = year+"-"+String(monthIdx+1).padStart(2,"0");
+  const i = DATA.labels.indexOf(label);
+  return i<0 ? null : DATA[key][i];
+}
+const MONTH_NAMES=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function barSeriesData(forYear){
+  if(periodMode==="year"){
+    return { cats: years, rows: SERIES_KEYS.map(k=>years.map(y=>yearlyReturn(k,y))) };
+  }
+  const yr = forYear ?? selectedYear;
+  // always all 12 month slots (missing months are null) so the category count never
+  // changes between years -- that's what lets the slider interpolate bar-to-bar smoothly
+  const cats = MONTH_NAMES;
+  const rows = SERIES_KEYS.map(k=>MONTH_NAMES.map((_,mi)=>monthlyReturn(k,yr,mi)));
+  return {cats, rows};
+}
+
+// fixed y-axis range for MONTHLY mode, spanning every month of every year -- computed once so
+// the axis never rescales/jitters while the year slider is dragged or animating between years
+let monthRange = null;
+function computeMonthRange(){
+  let vMax=0, vMin=0;
+  years.forEach(y=>SERIES_KEYS.forEach(k=>{
+    for(let mi=0;mi<12;mi++){
+      const v=monthlyReturn(k,y,mi);
+      if(v==null) continue;
+      if(v>vMax) vMax=v;
+      if(v<vMin) vMin=v;
+    }
+  }));
+  const pad=(vMax-vMin)*0.1;
+  monthRange = {vMax:vMax+pad, vMin:vMin-pad};
+}
+computeMonthRange();
+
+let BW=0,BH=0,bdpr=1;
+const BPADL=50, BPADR=14, BPADT=14, BPADB=26;
+let barHoverIdx=-1;
+
+function resizeBar(){
+  const wrap=$("#bwrap"); bdpr=Math.min(window.devicePixelRatio||1,2);
+  BW=wrap.clientWidth; BH=wrap.clientHeight;
+  if(BH<40||BW<40){ requestAnimationFrame(resizeBar); return; }
+  const cv=$("#bc"); cv.width=BW*bdpr; cv.height=BH*bdpr;
+  const ctx=cv.getContext("2d"); ctx.setTransform(bdpr,0,0,bdpr,0,0);
+  drawBar();
+}
+function niceStep(range){
+  const raw = range/6 || 1;
+  const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const n = raw/mag;
+  const s = n<=1?1:n<=2?2:n<=5?5:10;
+  return s*mag;
+}
+function roundRectTopBottom(ctx,x,y,w,h,r,positive){
+  r = Math.max(0,Math.min(r, w/2, h));
+  ctx.beginPath();
+  if(positive){
+    ctx.moveTo(x, y+h); ctx.lineTo(x, y+r); ctx.arcTo(x,y,x+r,y,r);
+    ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r); ctx.lineTo(x+w,y+h); ctx.closePath();
+  } else {
+    ctx.moveTo(x, y); ctx.lineTo(x, y+h-r); ctx.arcTo(x,y+h,x+r,y+h,r);
+    ctx.lineTo(x+w-r,y+h); ctx.arcTo(x+w,y+h,x+w,y+h-r,r); ctx.lineTo(x+w,y); ctx.closePath();
+  }
+}
+function drawBar(){
+  const {cats, rows} = barSeriesData();
+  drawBarRaw(cats, rows, periodMode==="month" ? monthRange : null);
+}
+function drawBarRaw(cats, rows, fixedRange){
+  const cv=$("#bc"); if(!cv) return;
+  const ctx=cv.getContext("2d");
+  ctx.clearRect(0,0,BW,BH);
+  const n = cats.length; if(!n) return;
+  let vMax, vMin;
+  if(fixedRange){ vMax=fixedRange.vMax; vMin=fixedRange.vMin; }
+  else {
+    const allVals = rows.flat().filter(v=>v!=null);
+    vMax = Math.max(0, ...allVals); vMin = Math.min(0, ...allVals);
+    if(vMax===vMin){ vMax=1; vMin=-1; }
+    const pad = (vMax-vMin)*0.1;
+    vMax += pad; vMin -= pad;
+  }
+  const plotW = BW-BPADL-BPADR, plotH = BH-BPADT-BPADB;
+  const yFor = v => BPADT + plotH * ((vMax-v)/(vMax-vMin));
+
+  ctx.font=chartFontPx()+'px "IBM Plex Mono", monospace'; ctx.textBaseline='middle';
+  const step = niceStep(vMax-vMin);
+  ctx.textAlign='right';
+  for(let v=Math.ceil(vMin/step)*step; v<=vMax; v+=step){
+    const yy=yFor(v);
+    ctx.strokeStyle=cssv('--border-2');
+    ctx.beginPath(); ctx.moveTo(BPADL,yy); ctx.lineTo(BW-BPADR,yy); ctx.stroke();
+    ctx.fillStyle=cssv('--muted'); ctx.fillText(Math.round(v)+"%", BPADL-8, yy);
+  }
+  const y0=yFor(0);
+  ctx.strokeStyle=cssv('--border'); ctx.lineWidth=1.3;
+  ctx.beginPath(); ctx.moveTo(BPADL,y0); ctx.lineTo(BW-BPADR,y0); ctx.stroke();
+
+  const groupW = plotW/n;
+  const barW = Math.min(20, groupW*0.24);
+  const gap = 3;
+
+  ctx.textAlign='center'; ctx.fillStyle=cssv('--muted');
+  for(let i=0;i<n;i++){
+    const gx = BPADL + groupW*(i+0.5);
+    ctx.fillText(cats[i], gx, BH-BPADB+12);
+    for(let s=0;s<3;s++){
+      const v = rows[s][i];
+      if(v==null) continue;
+      const bx = gx - (barW*3+gap*2)/2 + s*(barW+gap);
+      const by0=yFor(0), by1=yFor(v);
+      const top=Math.min(by0,by1), h=Math.max(1,Math.abs(by1-by0));
+      ctx.fillStyle = cssv(SERIES_COLOR[SERIES_KEYS[s]]);
+      ctx.globalAlpha = (barHoverIdx===i) ? 1 : 0.85;
+      roundRectTopBottom(ctx, bx, top, barW, h, 3, v>=0);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+function handleBarPoint(clientX, clientY){
+  const {cats, rows} = barSeriesData();
+  const n=cats.length; if(!n) return;
+  const rc = $("#bc").getBoundingClientRect();
+  const mx = clientX-rc.left, my = clientY-rc.top;
+  const plotW = BW-BPADL-BPADR;
+  const groupW = plotW/n;
+  let i = Math.floor((mx-BPADL)/groupW);
+  i = Math.max(0, Math.min(n-1, i));
+  if(i!==barHoverIdx){ barHoverIdx=i; drawBar(); }
+  const tip=$("#btip");
+  tip.style.opacity=1;
+  const th=tip.offsetHeight||120, tw=tip.offsetWidth||190;
+  let lx=mx-tw/2; lx=Math.max(6,Math.min(lx,BW-tw-6));
+  let ly=my-th-14; if(ly<6) ly=my+14;
+  tip.style.left=lx+"px"; tip.style.top=ly+"px";
+  const label = periodMode==="year" ? cats[i] : (cats[i]+" "+selectedYear);
+  const fmtPct = v => v==null ? "–" : (v>=0?"+":"")+v.toFixed(2)+"%";
+  tip.innerHTML = `<div class="t">${label}</div>`+
+    `<div class="r"><span>ChowMo</span><b>${fmtPct(rows[0][i])}</b></div>`+
+    `<div class="r"><span>TLT</span><b>${fmtPct(rows[1][i])}</b></div>`+
+    `<div class="r"><span>Momo</span><b>${fmtPct(rows[2][i])}</b></div>`;
+}
+function hideBarTip(){ barHoverIdx=-1; $("#btip").style.opacity=0; drawBar(); }
+$("#bwrap").addEventListener("mousemove", e=>handleBarPoint(e.clientX,e.clientY));
+$("#bwrap").addEventListener("mouseleave",hideBarTip);
+$("#bwrap").addEventListener("touchstart",e=>{ const t=e.touches[0]; if(t) handleBarPoint(t.clientX,t.clientY); },{passive:true});
+$("#bwrap").addEventListener("touchmove",e=>{ const t=e.touches[0]; if(t){ handleBarPoint(t.clientX,t.clientY); e.preventDefault(); } },{passive:false});
+$("#bwrap").addEventListener("touchend",hideBarTip);
+
+function updateYearSliderVisibility(){ $("#bYearRow").hidden = periodMode!=="month"; }
+$("#periodGrp").addEventListener("click", e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  periodMode = b.dataset.p;
+  $("#periodGrp").querySelectorAll("button").forEach(x=>x.classList.toggle("on", x===b));
+  updateYearSliderVisibility();
+  barAnimId=null; drawBar();
+});
+
+/* smoothly interpolate bar heights between the previous year and the newly selected one */
+let barAnimId=null;
+function animateToYear(newYear){
+  const from = barSeriesData(selectedYear).rows;
+  selectedYear = newYear;
+  const {cats, rows: to} = barSeriesData(selectedYear);
+  const start = performance.now(), dur = 220;
+  const myId = ++_barAnimSeq; barAnimId = myId;
+  function step(t){
+    if(barAnimId!==myId) return;
+    const p = Math.min(1, (t-start)/dur);
+    const ease = p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+    const mixed = from.map((series,s)=>series.map((v,i)=>{
+      const a = v==null?0:v, b = to[s][i]==null?0:to[s][i];
+      if(v==null && to[s][i]==null) return null;
+      return a+(b-a)*ease;
+    }));
+    drawBarRaw(cats, mixed, monthRange);
+    if(p<1) requestAnimationFrame(step); else drawBarRaw(cats, to, monthRange);
+  }
+  requestAnimationFrame(step);
+}
+let _barAnimSeq=0;
+$("#barYear").addEventListener("input",e=>{
+  const year=e.target.value;
+  $("#barYearVal").textContent=year;
+  animateToYear(year);
+});
+$("#barYearVal").textContent = $("#barYear").value;
+updateYearSliderVisibility();
+window.addEventListener("resize",()=>{ clearTimeout(window._rzb); window._rzb=setTimeout(resizeBar,120); });
+requestAnimationFrame(resizeBar);
+</script>
