@@ -78,22 +78,34 @@
   .chart-title{font-size:24.75px;font-weight:600;margin:0 0 15px;letter-spacing:-.005em;}
   .chart-head{display:grid;grid-template-columns:1fr auto;align-items:start;gap:15px;margin-bottom:12px;}
   .legend{display:flex;gap:22.5px;align-items:center;flex-wrap:wrap;}
-  .legend-item{display:flex;align-items:center;gap:9px;font-size:19.5px;color:var(--ink-2);font-weight:500;}
-  .legend-item .ln{width:22.5px;height:0;border-top:3px solid;flex:none;}
+  .legend-item{display:flex;align-items:center;gap:9px;font-size:19.5px;color:var(--ink-2);font-weight:500;
+    transition:opacity .12s,color .12s;}
+  .legend-item .ln{width:22.5px;height:0;border-top:3px solid;flex:none;transition:border-top-width .12s;}
   .legend-item.bench .ln{border-top-style:dashed;}
   .legend-item.combined .ln{border-top-width:4.5px;}
+  .legend-item.dimmed{opacity:.4;}
+  .legend-item.hover-active{color:var(--ink);font-weight:700;}
+  .legend-item.hover-active .ln{border-top-width:6px;}
   .toggle{display:flex;align-items:center;gap:9px;font-size:19.5px;color:var(--ink-2);cursor:pointer;}
   .toggle input{accent-color:var(--accent);}
 
   .chart-wrap{position:relative;height:600px;}
   canvas{display:block;width:100%;height:100%;}
-  #tip,#btip{position:absolute;pointer-events:none;opacity:0;transition:opacity .08s;background:var(--surface);
-    border:1.5px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:13.5px 16.5px;font-size:18.75px;
-    font-family:"IBM Plex Mono",monospace;z-index:10;min-width:277.5px;}
-  #tip .t,#btip .t{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:20.25px;color:var(--ink);margin-bottom:7.5px;}
-  #tip .r,#btip .r{display:grid;grid-template-columns:1fr auto;gap:18px;color:var(--ink-2);padding:2.25px 0;}
-  #tip .r b,#btip .r b{color:var(--ink);text-align:right;}
+  #tip,#btip{position:absolute;pointer-events:none;opacity:0;transition:opacity .08s,left .1s,top .1s;background:var(--surface);
+    border:1.5px solid var(--border);border-radius:10px;box-shadow:var(--shadow);padding:8.25px 10.5px;font-size:13.8px;
+    font-family:"IBM Plex Mono",monospace;z-index:10;line-height:1.3;}
+  /* width/position: JS (positionTip()) measures natural size then picks whichever of the 4 chart
+     corners currently has the least line traffic under it, and sets left/top inline -- these are
+     just layout fallbacks before the first measurement. width:max-content so short lists (fewer
+     portfolios ticked) don't reserve space for names that aren't shown. */
+  #tip{width:max-content;max-width:314px;max-height:calc(100% - 24px);overflow-y:auto;}
+  #tip .t,#btip .t{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:14.6px;color:var(--ink);margin-bottom:4.5px;}
+  #tip .r,#btip .r{display:grid;grid-template-columns:1fr auto;gap:10.5px;color:var(--ink-2);padding:1.2px 3.6px;border-radius:5px;}
+  #tip .r span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #tip .r b,#btip .r b{color:var(--ink);text-align:right;white-space:nowrap;}
   #tip .r.hi b{color:var(--accent);}
+  #tip .r.active{background:var(--panel-2);}
+  #tip .r.active span,#tip .r.active b{color:var(--ink);font-weight:700;}
 
   .btn{font:inherit;font-size:19.5px;font-weight:500;padding:7.5px 15px;border-radius:10.5px;
     border:1.5px solid var(--border);background:var(--panel);color:var(--ink);cursor:pointer;}
@@ -173,8 +185,9 @@
     .legend-item{font-size:13.5px;}
     .toggle{font-size:13.5px;}
     .btn,.resgrp button{font-size:13.5px;padding:6px 11px;}
-    #tip,#btip{font-size:13.5px;min-width:170px;}
-    #tip .t,#btip .t{font-size:14.5px;}
+    #tip,#btip{font-size:12.2px;padding:6.5px 8.5px;}
+    #tip{max-width:190px;}
+    #tip .t,#btip .t{font-size:12.8px;}
     footer{font-size:11.5px;}
   }
 </style>
@@ -383,16 +396,23 @@ function syncSliders(){
 }
 
 function buildCurveLegend(){
-  let html = `<div class="legend-item combined"><span class="ln" style="border-color:var(--accent)"></span>Combined (weighted mix)</div>`;
+  let html = `<div class="legend-item combined" data-key="combo"><span class="ln" style="border-color:var(--accent)"></span>Combined (weighted mix)</div>`;
   enabledPortfolios().forEach(p=>{
-    html += `<div class="legend-item"><span class="ln" style="border-color:var(${p.color})"></span>${p.label}</div>`;
+    html += `<div class="legend-item" data-key="${p.key}"><span class="ln" style="border-color:var(${p.color})"></span>${p.label}</div>`;
   });
   if(showBench){
     BENCHMARKS.forEach(b=>{
-      html += `<div class="legend-item bench"><span class="ln" style="border-color:var(${b.color})"></span>${b.label}</div>`;
+      html += `<div class="legend-item bench" data-key="${b.key}"><span class="ln" style="border-color:var(${b.color})"></span>${b.label}</div>`;
     });
   }
   $("#curveLegend").innerHTML = html;
+}
+function updateLegendHighlight(){
+  document.querySelectorAll('#curveLegend .legend-item').forEach(el=>{
+    const active = hoverKey!==null && el.dataset.key===hoverKey;
+    el.classList.toggle('hover-active', active);
+    el.classList.toggle('dimmed', hoverKey!==null && !active);
+  });
 }
 function buildBarLegend(){
   $("#barLegend").innerHTML = enabledPortfolios().map(p=>
@@ -472,7 +492,7 @@ function renderKPIs(curves){
 /* ---------- chart ---------- */
 let W_px=0,H_px=0,PADL=81,PADR=21,PADT=21,PADB=42,dpr=1;
 let xMin=0,xMax=1,yLo=1,yHi=1;
-let curves=null, showIndiv=true, showBench=false, hoverI=-1;
+let curves=null, showIndiv=true, showBench=false, hoverI=-1, hoverKey=null;
 
 function resize(){
   const wrap=$("#cwrap"); dpr=Math.min(window.devicePixelRatio||1,2);
@@ -499,7 +519,10 @@ function recompute(){
   if(showIndiv){ enabledPortfolios().forEach(p=>curves[p.key].forEach(v=>all.push(v))); }
   if(showBench){ BENCHMARKS.forEach(b=>curves[b.key].forEach(v=>all.push(v))); }
   curves.combo.forEach(v=>all.push(v));
-  yLo=Math.max(Math.min(...all)*0.9,0.05); yHi=Math.max(...all)*1.1;
+  // extra top headroom (vs the previous 1.1x) so the fixed top-left tooltip has clear sky above
+  // the highest line in the common case -- combined with every series starting at $1.00 on the
+  // left edge, the top-left corner is rarely where a line actually sits.
+  yLo=Math.max(Math.min(...all)*0.9,0.05); yHi=Math.max(...all)*1.25;
   renderKPIs(curves);
 }
 
@@ -519,15 +542,23 @@ function draw(){
 
   ctx.strokeStyle=cssv('--border-2'); ctx.fillStyle=cssv('--muted'); ctx.lineWidth=1.5;
   ctx.font=chartFontPx()+'px "IBM Plex Mono", monospace'; ctx.textBaseline='middle';
+  // i===0 is the $1.00 baseline point, shown labeled with the user's actual selection
+  // (chartPlotStartIdx) rather than the hidden pre-period date the rebase math uses
+  // (chartStartIdx), so the axis-start label matches what the slider says. Every other point
+  // ticks on its own real January. Because the baseline and the very next real point can be
+  // the SAME calendar month (e.g. baseline relabeled "Jan" while point 1 genuinely IS January),
+  // track the last label actually drawn and never draw the same one twice, instead of assuming
+  // which index that collision falls on.
+  ctx.textAlign='center';
+  let lastAxisLabel = null;
   for(let i=0;i<curves.combo.length;i++){
-    // i===0 is the $1.00 baseline point -- always tick it, labeled with the user's actual
-    // selection (chartPlotStartIdx), not the hidden pre-period date the rebasing math uses
-    // (chartStartIdx); every other point ticks only on its own real January.
     const lbl = i===0 ? DATA.labels[chartPlotStartIdx] : DATA.labels[i+chartStartIdx];
     if(i!==0 && !lbl.endsWith("-01")) continue;
+    if(lbl===lastAxisLabel) continue;
+    lastAxisLabel = lbl;
     const x=X(i);
     ctx.beginPath();ctx.moveTo(x,PADT);ctx.lineTo(x,H_px-PADB);ctx.stroke();
-    ctx.textAlign='center'; ctx.fillText("'"+lbl.slice(2,4), x, H_px-PADB+16.5);
+    ctx.fillText("'"+lbl.slice(2,4), x, H_px-PADB+16.5);
   }
   const yticks=niceLog(yLo,yHi);
   ctx.textAlign='right';
@@ -535,63 +566,119 @@ function draw(){
     ctx.strokeStyle=cssv('--border-2'); ctx.beginPath();ctx.moveTo(PADL,y);ctx.lineTo(W_px-PADR,y);ctx.stroke();
     ctx.fillStyle=cssv('--muted'); ctx.fillText("$"+v.toFixed(v>=10?0:1), PADL-16, y); });
 
-  if(showIndiv){
-    enabledPortfolios().forEach(p=>{
-      ctx.strokeStyle=cssv(p.color); ctx.lineWidth=1.95; ctx.globalAlpha=.55;
-      ctx.stroke(pathFor(curves[p.key]));
-    });
-    ctx.globalAlpha=1;
+  // draw every visible line, then redraw ONLY the hovered one on top at full strength -- so the
+  // highlighted line is never occluded by the others regardless of which category it belongs to
+  function lineStyle(key){
+    if(key==='combo') return {color:'--accent', dashed:false, w:5.2, a:1};
+    const p=portfolioByKey(key);
+    if(p) return {color:p.color, dashed:false, w:1.95, a:.55};
+    const b=BENCHMARKS.find(x=>x.key===key);
+    return {color:b.color, dashed:true, w:1.95, a:.7};
   }
-  if(showBench){
-    ctx.setLineDash([10,8]);
-    BENCHMARKS.forEach(b=>{
-      ctx.strokeStyle=cssv(b.color); ctx.lineWidth=1.95; ctx.globalAlpha=.7;
-      ctx.stroke(pathFor(curves[b.key]));
-    });
+  function drawLine(key, hovered, anyHover){
+    const st=lineStyle(key);
+    ctx.strokeStyle=cssv(st.color);
+    ctx.lineWidth = hovered ? st.w*1.4+1.5 : st.w;
+    ctx.globalAlpha = !anyHover ? st.a : (hovered ? 1 : st.a*0.3);
+    ctx.lineJoin="round"; ctx.lineCap="round";
+    if(st.dashed) ctx.setLineDash(hovered?[]:[10,8]); else ctx.setLineDash([]);
+    ctx.stroke(pathFor(curves[key]));
     ctx.setLineDash([]); ctx.globalAlpha=1;
   }
-  ctx.strokeStyle=cssv('--accent'); ctx.lineWidth=5.2; ctx.lineJoin="round"; ctx.lineCap="round";
-  ctx.stroke(pathFor(curves.combo));
+  const visibleKeys=[];
+  if(showIndiv){ enabledPortfolios().forEach(p=>visibleKeys.push(p.key)); }
+  if(showBench){ BENCHMARKS.forEach(b=>visibleKeys.push(b.key)); }
+  visibleKeys.push('combo');
+  const anyHover = hoverKey!==null && visibleKeys.includes(hoverKey);
+  visibleKeys.forEach(k=>{ if(k!==hoverKey) drawLine(k, false, anyHover); });
+  if(anyHover) drawLine(hoverKey, true, true);
 
   if(hoverI>=0){
     const x=X(hoverI);
     ctx.strokeStyle=cssv('--border'); ctx.setLineDash([4.5,4.5]); ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.moveTo(x,PADT); ctx.lineTo(x,H_px-PADB); ctx.stroke(); ctx.setLineDash([]);
-    const dot=(series,col)=>{ ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,Y(series[hoverI]),4.5,0,7); ctx.fill();
-      ctx.fillStyle=cssv('--surface'); ctx.beginPath(); ctx.arc(x,Y(series[hoverI]),1.95,0,7); ctx.fill(); };
-    if(showIndiv){ enabledPortfolios().forEach(p=>dot(curves[p.key],cssv(p.color))); }
-    if(showBench){ BENCHMARKS.forEach(b=>dot(curves[b.key],cssv(b.color))); }
-    dot(curves.combo,cssv('--accent'));
+    const dot=(key,series,col)=>{
+      const big = key===hoverKey; const r1=big?6.5:4.5, r2=big?2.8:1.95;
+      ctx.fillStyle=col; ctx.beginPath(); ctx.arc(x,Y(series[hoverI]),r1,0,7); ctx.fill();
+      ctx.fillStyle=cssv('--surface'); ctx.beginPath(); ctx.arc(x,Y(series[hoverI]),r2,0,7); ctx.fill(); };
+    if(showIndiv){ enabledPortfolios().forEach(p=>dot(p.key,curves[p.key],cssv(p.color))); }
+    if(showBench){ BENCHMARKS.forEach(b=>dot(b.key,curves[b.key],cssv(b.color))); }
+    dot('combo',curves.combo,cssv('--accent'));
   }
 }
 
 function handleChartPoint(clientX, clientY){
   const rc=$("#cv").getBoundingClientRect();
-  const mx=clientX-rc.left;
+  const mx=clientX-rc.left, my=clientY-rc.top;
   let i=Math.round((mx-PADL)/((W_px-PADL-PADR)||1)*(xMax-xMin)+xMin);
   i=Math.max(0,Math.min(curves.combo.length-1,i));
-  if(i!==hoverI){ hoverI=i; draw(); }
+
+  // which line is the mouse actually closest to (vertically) at this column -- not just which
+  // column, so hovering near a specific line highlights THAT one, not whatever draws last
+  const candidates=[{key:'combo', label:'Combined'}];
+  if(showIndiv){ enabledPortfolios().forEach(p=>candidates.push({key:p.key, label:p.label})); }
+  if(showBench){ BENCHMARKS.forEach(b=>candidates.push({key:b.key, label:b.label})); }
+  let bestKey=null, bestDist=Infinity;
+  candidates.forEach(c=>{ const d=Math.abs(Y(curves[c.key][i])-my); if(d<bestDist){ bestDist=d; bestKey=c.key; } });
+
+  if(i!==hoverI || bestKey!==hoverKey){
+    hoverI=i; hoverKey=bestKey;
+    draw(); updateLegendHighlight();
+  }
+
   const tip=$("#tip");
-  tip.style.opacity=1;
-  const th=tip.offsetHeight||210, tw=tip.offsetWidth||300;
-  let lx=(clientX-rc.left)-tw/2; lx=Math.max(9,Math.min(lx,W_px-tw-9));
-  let ly=(clientY-rc.top)-th-24; if(ly<9) ly=(clientY-rc.top)+24;
-  tip.style.left=lx+"px"; tip.style.top=ly+"px";
-  const rows=[`<div class="r hi"><span>Combined</span><b>${fmtMult(curves.combo[i])}</b></div>`];
-  if(showIndiv){
-    enabledPortfolios().forEach(p=>{
-      rows.push(`<div class="r"><span>${p.label}</span><b>${fmtMult(curves[p.key][i])}</b></div>`);
-    });
-  }
-  if(showBench){
-    BENCHMARKS.forEach(b=>{
-      rows.push(`<div class="r"><span>${b.label}</span><b>${fmtMult(curves[b.key][i])}</b></div>`);
-    });
-  }
+  tip.style.opacity=1;	// position is fixed via CSS (top-left of the chart) -- no longer follows the mouse
+  const rows = candidates.map(c=>{
+    const cls = [c.key==='combo'?'hi':'', c.key===hoverKey?'active':''].filter(Boolean).join(' ');
+    return `<div class="r ${cls}"><span>${c.label}</span><b>${fmtMult(curves[c.key][i])}</b></div>`;
+  });
   const dateLbl = i===0 ? DATA.labels[chartPlotStartIdx] : DATA.labels[i+chartStartIdx];
   tip.innerHTML = `<div class="t">${dateLbl}</div>` + rows.join("");
+  positionEquityTip(candidates.map(c=>c.key));
 }
-function hideChartTip(){ hoverI=-1; $("#tip").style.opacity=0; draw(); }
+
+// how many (series, index) points fall inside a candidate box, +/- a small margin -- used to
+// steer the tooltip away from wherever the actual lines are, instead of pinning one corner
+function tipOverlapScore(keys, rectL, rectT, rectR, rectB){
+  const pad=7; let score=0;
+  for(let i=0;i<curves.combo.length;i++){
+    const x=X(i);
+    if(x<rectL-pad||x>rectR+pad) continue;
+    for(const k of keys){
+      const y=Y(curves[k][i]);
+      if(y>=rectT-pad && y<=rectB+pad) score++;
+    }
+  }
+  return score;
+}
+
+// horizontal side follows the active point/vertical line: the line sits at some fraction of the
+// plot width (0% = left edge, 100% = right edge) -- if it's on the right half (51-100%) the box
+// goes on the LEFT, if it's on the left half (0-49%) the box goes on the RIGHT, so the box is
+// always on the opposite side from where the cursor (and the dashed vertical line) actually is.
+// Top vs bottom, on whichever side that picks, still goes to whichever has less line traffic
+// under it -- re-scored on every hover move.
+function positionEquityTip(keys){
+  const tip=$("#tip");
+  const tw=tip.offsetWidth, th=tip.offsetHeight;
+  if(!tw||!th) return;
+  const inset=10;
+  const plotW=(W_px-PADL-PADR)||1;
+  const hoverX = hoverI>=0 ? X(hoverI) : PADL;
+  const fracX = (hoverX-PADL)/plotW;	// 0 = left edge, 1 = right edge
+  const onLeft = fracX >= 0.5;		// line on the right half (51-100%) -> box on the left; else box on the right
+  const l = onLeft ? PADL+inset : W_px-PADR-inset-tw;
+  const topCandidates=[PADT+inset, H_px-PADB-inset-th];
+  let bestT=topCandidates[0], bestScore=Infinity;
+  topCandidates.forEach(t=>{
+    const score=tipOverlapScore(keys, l, t, l+tw, t+th);
+    if(score<bestScore){ bestScore=score; bestT=t; }
+  });
+  const ll=Math.max(PADL+4, Math.min(W_px-PADR-4-tw, l));
+  const tt=Math.max(PADT+4, Math.min(H_px-PADB-4-th, bestT));
+  tip.style.left=ll+'px'; tip.style.top=tt+'px';
+}
+function hideChartTip(){ hoverI=-1; hoverKey=null; $("#tip").style.opacity=0; draw(); updateLegendHighlight(); }
 $("#cwrap").addEventListener("mousemove",e=>handleChartPoint(e.clientX,e.clientY));
 $("#cwrap").addEventListener("mouseleave",hideChartTip);
 $("#cwrap").addEventListener("touchstart",e=>{ const t=e.touches[0]; if(t) handleChartPoint(t.clientX,t.clientY); },{passive:true});
